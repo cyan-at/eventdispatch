@@ -1,0 +1,16 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='eventdispatch',
+    version='0.1',
+    description='Event Dispatch, a discrete time synchronizer',
+    url='http://github.com/cyan-at/eventdispatch',
+    author='Charlie Yan',
+    author_email='charlieyan08@gmail.com',
+    license='Apache-2.0',
+    install_requires=['requests'],
+    packages=find_packages(),
+    entry_points=dict(
+        console_scripts=['rq=src.main:display_quote']
+    )
+)
