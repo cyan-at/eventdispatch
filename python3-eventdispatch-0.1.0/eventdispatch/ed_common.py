@@ -1,3 +1,11 @@
+'''
+Created on 2025-05-23
+
+@author: Charlie Yan
+
+Copyright (c) 2025, Charlie Yan
+License: Apache-2.0 (see LICENSE for details)
+'''
 from __future__ import print_function
 
 import sys, os, time

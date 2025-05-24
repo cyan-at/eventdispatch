@@ -1,3 +1,11 @@
+'''
+Created on 2025-05-23
+
+@author: Charlie Yan
+
+Copyright (c) 2025, Charlie Yan
+License: Apache-2.0 (see LICENSE for details)
+'''
 import requests
 
 _QUOTE_URL = 'https://quotes.rest/qod'
