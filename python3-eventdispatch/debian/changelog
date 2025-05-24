@@ -1,3 +1,9 @@
+python3-eventdispatch (0.1.2) noble; urgency=high
+
+  * Add copyright
+
+ -- Charlie Yan <cyanatg@gmail.com> Sat, 24 May 2025 10:00:00 -0700
+ 
 python3-eventdispatch (0.1.1) noble; urgency=medium
 
   * Initial release.
