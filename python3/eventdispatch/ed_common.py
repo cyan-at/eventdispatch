@@ -260,6 +260,7 @@ class EventDispatch(object):
       self.blackboard[ed_id] = self # register self on blackboard
 
   # something child ED class can override
+  # for Event.deserialize to form some event_id
   def reserve_event_id(self):
     print("reserve_event_id!", self.event_id_pool)
     if len(self.event_id_pool) > 0:
@@ -297,10 +298,6 @@ class EventDispatch(object):
     # this includes multiple subsequent concurrent events
 
     self.release_event_id(event_id)
-
-  def log(self, msg, params = None):
-    # for children to override
-    print(msg)
 
 # 2018-01-11 often we spawn child threads but if they fail at any point
 # the parent thread cannot know beyond a callback indirectly that the

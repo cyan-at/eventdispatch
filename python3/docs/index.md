@@ -1,4 +1,4 @@
-# python3-eventdispatch
+# [python3-eventdispatch](https://github.com/cyan-at/eventdispatch)
 
 **eventdispatch** is a Python package for solving the *discrete time synchronization problem* in any computer system. It consists of:
 
@@ -8,6 +8,7 @@
     3. **[Event](classes#event)**, the abstract base class to override
     4. **[Blackboard](classes#blackboard)**, a thread safe dictionary
     5. **[BlackboardQueueCVED](classes#bqcved)**, a example Dispatch subclass that ties the above together
+    6. various other decorators, helper functions
 2. **ed_node** python program, a work in progress
 
 ---
@@ -20,4 +21,4 @@
 
 * Although originally designed for robotics systems, the **eventdispatch** framework is relevant in any system where synchronization is important, deals with any **uncertainty**.
 
-* Within a system, more than one component can and should *dispatch events*; *dispatch* is a **verb**, not a **noun**, related to [double dispatch](https://en.wikipedia.org/wiki/Double_dispatch)
+* Within a system, more than one component can *dispatch events*; *dispatch* is a **verb**, not a **noun**.
