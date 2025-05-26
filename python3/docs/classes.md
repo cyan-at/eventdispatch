@@ -1,7 +1,6 @@
-Usage patterns & best practices
-=====
+# Classes
 
-Installation
+eventdispatch
 ------------
 
 To use Lumache, first install it using pip:
