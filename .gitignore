@@ -174,5 +174,5 @@ cython_debug/
 .pypirc
 
 python3-eventdispatch_*
-python3-eventdispatch/debian/files
+python3/debian/files
 .fuse_hidden*
