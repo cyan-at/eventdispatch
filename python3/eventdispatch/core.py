@@ -333,11 +333,26 @@ class Blackboard(dict):
     self.cv_pool = []
     self.cvs = {}
 
+  # def __getitem__(self, key):
+  #   return super().__getitem__(key)
+
+  def __setitem__(self, key, value):
+    super(Blackboard, self).__setitem__(key, value)
+    if key in self.cvs:
+      print("blackboard notifying",
+        key,
+        value)
+      self.cvs[key]['queue'].append(value)
+      with self.cvs[key]['l']:
+          self.cvs[key]['cv'].notify_all()
+
+  # def __delitem__(self, key):
+  #   # TODO, add notify here
+  #   super().__delitem__(key)
+
   def release_cv(self, key):
-    print("RELEASING CV", key)
     with self.cv_pool_lock:
       if key not in self.cvs:
-        print("RELEASING MISSING CV!", key)
       else:
         cv_set = self.cvs.pop(key)
         cv_set['count'] = 0
@@ -362,22 +377,6 @@ class Blackboard(dict):
 
       self.cvs[payload] = cv_set
     return cv_set
-
-  # def __getitem__(self, key):
-  #   return super().__getitem__(key)
-
-  def __setitem__(self, key, value):
-    super(Blackboard, self).__setitem__(key, value)
-    if key in self.cvs:
-      print("blackboard notifying",
-        key,
-        value)
-      self.cvs[key]['queue'].append(value)
-      with self.cvs[key]['l']:
-          self.cvs[key]['cv'].notify_all()
-
-  def __delitem__(self, key):
-    super().__delitem__(key)
 
 class BlackboardQueueCVED(EventDispatch):
   def __init__(self, blackboard, name):
