@@ -1,14 +1,32 @@
-Best practices
-=====
+# Usage
+
+## Best practices
 
 * Events should only exist *as needed*.
-* Events should be *short-lived*, relying on [actors](classes#actors) to focus on *continuous time* tasks.
-* Events should be as **state-less** as possible, instead relying on [blackboard](classes#blackboard)s to store state.
+* Events should be *short-lived*, relying on [actors](classes.md#actors) to focus on *continuous time* tasks.
+* Events should be as **state-less** as possible, instead relying on [blackboard](classes.md#blackboard)s to store state.
 * Keep your Event definitions DRY, push as much variance into arguments.
-* Whenever possible, decompose your use case to the [event](classes#event) level, not further to the [dispatch](classes#dispatch) level unless absolutely necessary.
+* Whenever possible, decompose your use case to the [event](classes.md#event) level, not further to the [dispatch](classes.md#eventdispatch) level unless absolutely necessary.
 
-Patterns
-=====
+---
+**NOTE**
+
+Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\), where \(f(x)\) and \(g(w)\) are largely implicit, and Events define \(b(u)\).
+
+There is **no guarantee of stability nor optimality**, that is left to the implementation. 
+
+---
+
+---
+**NOTE**
+
+Because this framework relies on python's `threading` library, the *exact ordering* of things is not deterministic.
+
+Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling configuration.
+
+---
+
+## Patterns
 
 * To deal with *temporal uncertainty*, sibling threads are dispatched together, and whichever finishes first, *interrupts / kills* sibling events.
 * To deal with *spatial* uncertainty, Event(s) most collocated to that uncertainty deal with it immediately in their `finish` functions, or downstream dispatched events infer from blackboard state
@@ -18,6 +36,5 @@ Patterns
 	* 'Open-the-mouth-before-you-feed-it' : For example, make sure any `condition_variable` is waited upon before you notify it.
 	* 'Buffer-and-drain' : Producers populate some buffer, and whoever reads it, drains it completely every time.
 
-Example Use Cases
-=====
+## Example Use Cases
 (TODO)
