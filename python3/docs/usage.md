@@ -11,7 +11,11 @@
 ---
 **NOTE**
 
-Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\), where \(f(x)\) and \(g(w)\) are largely implicit, and Events define \(b(u)\).
+Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\)
+
+Drift \(f(x)\) and diffusion \(g(w)\) and control \(b(u)\).
+
+Events define \(f(x)\) and \(b(u)\), and \(g(w)\) is compensated for.
 
 There is **no guarantee of stability nor optimality**, that is left to the implementation. 
 

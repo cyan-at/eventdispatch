@@ -39,63 +39,104 @@ class Blackboard(dict):
 
 ```python
 class EventThread(threading.Thread):
-  """Thread class with a stop() method. The thread itself has to check
-  regularly for the stopped() condition."""
+    '''
+    a thread, with callback, oneshot, delay, terminate additions
+    '''
+    def __init__(self,
+        callback = None,
+        oneshot = True,
+        delay_secs = None,
+        *args, **kwargs):
+        '''
+        a thread, with callback, oneshot, delay, terminate additions
+        '''
 
-  def __init__(self,
-    callback = None,
-    oneshot = True,
-    delay_secs = None,
-    *args, **kwargs):
-    super(EventThread, self).__init__(*args, **kwargs)
-    self.callback = callback
-    self.oneshot = oneshot
-    self.delay_secs = delay_secs
+    def terminate(self):
+        '''
+        cooperative support
+        '''
 
-    # IMPORTANT, threading library
-    # wants to call a function _stop()
-    # so we must name this to not override that
-    self._stop_event = threading.Event()
+    def stopped(self):
+        '''
+        cooperative support
+        '''
 
-  def terminate(self):
-    self._stop_event.set()
-
-  def stopped(self):
-    return self._stop_event.isSet()
-
-  def run(self):
-    # print "starting up stoppable thread"
-    if self.delay_secs is not None:
-      time.sleep(self.delay_secs)
-    super(EventThread, self).run()
-    if self.oneshot:
-      self.terminate()
-    if self.callback:
-      self.callback()
+    def run(self):
+        '''
+        a wrapper around base class's run
+        '''
 ```
 
 ## Event
 
 ```python
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
+class Event(object):
+    '''
+    an interface / abstract-base-class
+    child classes must override deserialize, dispatch, and finish
+    '''
+
+    def __init__(self, event_id, *args, **kwargs):
+        '''
+        constructor
+        '''
+
+    def get_id(self):
+        '''
+        every event has an id, internal to this dispatch instance
+        '''
+
+    @staticmethod
+    def deserialize(ed, blackboard, *args, **kwargs):
+        '''
+        Child Event types MUST override
+        It defines how an array is deserialized into an Event instance
+        '''
+
+    def dispatch(self, event_dispatch, *args, **kwargs):
+        '''
+        Child Event types MUST override
+
+        Consider this function as
+        'injecting' drift and uncertainty into the system
+        '''
+
+    def finish(self, event_dispatch, *args, **kwargs):
+        '''
+        Child Event types MUST override
+
+        Consider this function as
+        'injecting' control into the system
+        '''
 ```
 
 ## EventDispatch
 
 ```python
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
+class EventDispatch(object):
+    def __init__(self, blackboard = None : dict, ed_id = None : str):
+        '''
+        constructor
+        '''
+
+    def reserve_event_id(self):
+        '''
+        at any one time, event ids must be unique / no collisions
+        '''
+
+    def release_event_id(self, event_id):
+        '''
+        event id hygiene
+        '''
+
+    def dispatch(self, event, *args, **kwargs):
+        '''
+        CORE function 1: spawn a thread with a constructed event
+        '''
+
+    def dispatch_finish(self, event, *args, **kwargs):
+        '''
+        CORE function 2: call an event's finish method
+        and hygiene
+        '''
 ```
-
-## bqcved
-
-```python
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
-```
-
-

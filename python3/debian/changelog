@@ -1,3 +1,15 @@
+python3-eventdispatch (0.1.8) noble; urgency=high
+
+  * ed_common to core
+
+ -- Charlie Yan <cyanatg@gmail.com> Tue, 27 May 2025 1:38:00 -0700
+
+python3-eventdispatch (0.1.7) noble; urgency=high
+
+  * ed_common to core
+
+ -- Charlie Yan <cyanatg@gmail.com> Tue, 27 May 2025 11:41:00 -0700
+
 python3-eventdispatch (0.1.6) noble; urgency=high
 
   * ed_node.py placeholder

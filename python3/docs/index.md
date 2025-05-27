@@ -7,14 +7,15 @@
     2. **[EventThread](classes.md#eventthread)**, a thread subclass
     3. **[Event](classes.md#event)**, the abstract base class to override
     4. **[EventDispatch](classes.md#eventdispatch)**, which defines core mechanism functions
-    5. **[BlackboardQueueCVED](classes.md#bqcved)**, a example Dispatch subclass that ties the above together
-    6. Various other decorators, helper functions
-2. **ed_node** python program, a work in progress
+    5. Various other decorators, helper functions
+2. A **aux1** python module, with:
+    1. **[BlackboardQueueCVED](classes.md#bqcved)**, a example Dispatch subclass that ties the above together
+    2. Various other decorators, helper functions
+3. **ed_node** python program, a work in progress
 
 ---
 
-* Other synchronization architectures exist such as [behavior trees](https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)) and [state machines](https://en.wikipedia.org/wiki/Finite-state_machine).
-
+* Other synchronization architectures exist such as <a href="https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)" target="_blank">behavior trees</a> and <a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="_blank">state machines</a>.
 * Compared to those architectures, **eventdispatch** is *thin*, *scalable*, inherently *concurrent* and *performant*. **Safety** and **hygiene** are first-order considerations.
 
 * Though inspired from robotics systems, this framework is relevant to the spatial and temporal *uncertainty* in simple and complex systems, and the *volatility* of what is asked of such systems. See [Usage patterns & best practices](usage.md).

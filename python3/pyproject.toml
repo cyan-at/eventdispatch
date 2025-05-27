@@ -5,4 +5,4 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "eventdispatch"
 authors = [{name = "Charlie Yan", email = "cyanatg@gmail.com"}]
-dynamic = ["version", "description"]
+dynamic = ["version", "description", "scripts", "dependencies", "license"]
