@@ -145,7 +145,13 @@ class EventDispatch(object):
 
 ## BlackboardQueueCVED
 
-This lives outside the `core`, but provides a component you can add in your python program. Integration involves definition 
+This lives outside the `core`, but provides a component you can add in your python program.
+
+0. Create `Blackboard` instances
+1. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
+2. Call their `register_blackboard_assets` on their appropriate `Blackboard` instances
+3. Stand up their `run` targets as threads
+4. Best practice: Practice thread hygiene, on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
 
 ```python
 class BlackboardQueueCVED(EventDispatch):
@@ -203,4 +209,4 @@ class BlackboardQueueCVED(EventDispatch):
         1. append ['EventName', 'arg1', arg2...] on this Dispatch's queue
         2. notify the dispatch's cv
         '''
-```
+``` 
