@@ -147,7 +147,7 @@ class EventDispatch(object):
 
 This lives outside the `core`, but provides a component you can add in your python program.
 
-0. Create `Blackboard` instances
+0. Create `Blackboard` instance(s)
 1. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
 2. Call their `register_blackboard_assets` on their appropriate `Blackboard` instances
 3. Stand up their `run` targets as threads
