@@ -140,3 +140,57 @@ class EventDispatch(object):
         and hygiene
         '''
 ```
+
+
+```python
+class BlackboardQueueCVED(EventDispatch):
+    def __init__(self, blackboard, name):
+        '''
+        constructor
+        '''
+
+    def prior_cb(self, blackboard):
+        '''
+        before draining any events in the queue, call this
+        '''
+
+    def post_cb(self, blackboard):
+        '''
+        after draining all events in the queue, call this
+        '''
+
+    def register_blackboard_assets(self, blackboard, name):
+        '''
+        populate a blackboard with this dispatch's supporting data
+        heartbeat
+        mutex
+        queue
+        condition variable
+        etc.
+        '''
+
+    def log(self, msg, params = None):
+        '''
+        supporting log function
+        '''
+
+    def reserve_event_id(self):
+        '''
+        return a event_id for a new event, override
+        '''
+
+    def release_event_id(self, event_id):
+        '''
+        free event_id
+        '''
+
+    def run(self, blackboard, # expected, dict
+        prefix, # expected, str
+        empty_cv_name = None, # expected, str
+        debug_color = None):
+        '''
+        main thread target
+        the empty_cv_name, if given, will be notified
+        whenever the queue is drained
+        '''
+```

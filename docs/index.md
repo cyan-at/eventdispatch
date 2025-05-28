@@ -9,7 +9,7 @@
     4. **[EventDispatch](classes.md#eventdispatch)**, which defines core mechanism functions
     5. Various other decorators, helper functions
 2. A **aux1** python module, with:
-    1. **[BlackboardQueueCVED](classes.md#bqcved)**, a example Dispatch subclass that ties the above together
+    1. **[BlackboardQueueCVED](classes.md#blackboardqueuecved)**, a example Dispatch subclass that ties the above together
     2. Various other decorators, helper functions
 3. **ed_node** python program, a work in progress
 
