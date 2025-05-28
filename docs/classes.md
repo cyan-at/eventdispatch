@@ -8,6 +8,8 @@ They produce and consume events via some inter-process-communication (IPC) carri
 
 ## Blackboard
 
+Define `Event` subclasses as `<Event name>`:`Event type` pairs in this dictionary
+
 ```python
 class Blackboard(dict):
 	'''
@@ -143,6 +145,8 @@ class EventDispatch(object):
 
 ## BlackboardQueueCVED
 
+This lives outside the `core`, but provides a component you can add in your python program. Integration involves definition 
+
 ```python
 class BlackboardQueueCVED(EventDispatch):
     def __init__(self, blackboard, name):
@@ -193,5 +197,10 @@ class BlackboardQueueCVED(EventDispatch):
         main thread target
         the empty_cv_name, if given, will be notified
         whenever the queue is drained
+
+        to 'dispatch' an event
+        0. make sure the 'EventName' : EventClass is a pair in the Blackboard
+        1. append ['EventName', 'arg1', arg2...] on this Dispatch's queue
+        2. notify the dispatch's cv
         '''
 ```
