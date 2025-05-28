@@ -151,7 +151,7 @@ This lives outside the `core`, but provides a component you can add in your pyth
 1. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
 2. Call their `register_blackboard_assets` on their appropriate `Blackboard` instances
 3. Stand up their `run` targets as threads
-4. Best practice: Practice thread hygiene, on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
+4. Best practice (thread hygiene): on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
 
 ```python
 class BlackboardQueueCVED(EventDispatch):
