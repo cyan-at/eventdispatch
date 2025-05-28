@@ -141,6 +141,7 @@ class EventDispatch(object):
         '''
 ```
 
+## BlackboardQueueCVED
 
 ```python
 class BlackboardQueueCVED(EventDispatch):
