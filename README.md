@@ -1,7 +1,7 @@
 # eventdispatch
 Event Dispatch: a discrete time synchronizer
 
-## Installation
+## python3: apt installation
 ```
 sudo add-apt-repository ppa:cyanatlaunchpad/python3-eventdispatch-ppa
 sudo apt update
