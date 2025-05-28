@@ -13,20 +13,28 @@
 
 Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\)
 
-Drift \(f(x)\) and diffusion \(g(w)\) and control \(b(u)\).
+Drift \(f(x)\)
 
-Events define \(f(x)\) and \(b(u)\), and \(g(w)\) is compensated for.
+Diffusion \(g(w)\)
 
-There is **no guarantee of stability nor optimality**, that is left to the implementation. 
+Control \(b(u)\)
+
+Events define \(f(x)\) and \(b(u)\)
+
+\(g(w)\) is compensated for
+
+Event dispatch systems **inject** drift, control, and **inject uncertainty** into a system
+
+There is **no guarantee of stability nor optimality**, that is left to the implementation 
 
 ---
 
 ---
 **NOTE**
 
-Because this framework relies on python's `threading` library, the *exact ordering* of things is not deterministic.
+Because this framework relies on python's `threading` library, the *exact ordering* of things is not deterministic
 
-Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling configuration.
+Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling configuration
 
 ---
 
