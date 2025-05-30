@@ -35,45 +35,20 @@ def call_when_switch_turned_on(obj, switch, switch_lock):
 class Blackboard(dict):
     def __init__(self, *args, **kwargs):
         self.mutex = Lock()
-        self.store = dict()
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
-        # free cvs
-        self.cv_pool_lock = Lock()
-        self.cv_pool = []
-        self.cvs = {}
-
     def __setitem__(self, key, value):
-        super(Blackboard, self).__setitem__(key, value)
-        self.cvs[key]['queue'].append(value)
-        with self.cvs[key]['l']:
-            self.cvs[key]['cv'].notify_all()
+        with self.mutex:
+            super(Blackboard, self).__setitem__(key, value)
 
-    def release_cv(self, key):
-        with self.cv_pool_lock:
-            if key in self.cvs:
-                cv_set = self.cvs.pop(key)
-                cv_set['count'] = 0
-                cv_set.pop('match_target')
-            self.cv_pool.append(cv_set)
+    def __getitem__(self, key):
+        with self.mutex:
+            res = super().__getitem__(key)
+        return res
 
-    def register_payload(self, payload, match_target = None):
-        with self.cv_pool_lock:
-            if len(self.cv_pool) > 0:
-                cv_set = self.cv_pool.pop(0)
-            else:
-                lock = threading.Lock()
-                cv_set = {
-                    'l' : lock,
-                    'cv' : threading.Condition(lock),
-                    'count' : 0,
-                    'queue' : [],
-                    # pattern: if the mouth is not open before you feed it, using a queue is one solution
-                    # the other solution is to enforce the sync using some blocking logic
-                }
-            cv_set["match_target"] = match_target
-            self.cvs[payload] = cv_set
-        return cv_set
+    def __delitem__(self, key):
+        with self.mutex:
+            super().__delitem__(key)
 
 class EventThread(threading.Thread):
     """
@@ -143,18 +118,7 @@ class Event(object):
         # OR SET THEM IN CONSTRUCTOR
         # OR SET THEM IN THE BLACKBOARD
         # unlike deserialize / finish, happens in its own thread
-        if self.get_id() not in event_dispatch.mutex_registry:
-            # when dispatched, it MUST have an ED (access to dispatch, events)
-            self.event_dispatch = event_dispatch
-
-        # dynamic registration in ED mutex_registry
-        # will let OTHER events block on this event's state
-        # ex:
-        # event_dispatch.mutex_registry[self.get_id()] = Lock()
-
-        # when dispatched, it MAY have a blackboard (access to actors)
-        # ex:
-        # self.blackboard = args[0]
+        raise NotImplementedError
 
     def finish(self, event_dispatch, *args, **kwargs):
         # unlike deserialize / dispatch, involves other events

@@ -11,7 +11,7 @@
 2. A **aux1** python module, with:
     1. **[BlackboardQueueCVED](classes.md#blackboardqueuecved)**, a example Dispatch subclass that ties the above together
     2. Various other decorators, helper functions
-3. **ed_node** python program, a work in progress
+3. **example1** python program
 
 ---
 

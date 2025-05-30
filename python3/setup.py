@@ -8,9 +8,9 @@ setup(
     author='Charlie Yan',
     author_email='cyanatg@gmail.com',
     license='Apache-2.0',
-    install_requires=['requests'],
+    install_requires=['threading', 'argparse'],
     packages=find_packages(),
     entry_points=dict(
-        console_scripts=['ed_node=eventdispatch.ed_node:main']
+        console_scripts=['eventdispatch_example1=eventdispatch.example1:main']
     )
 )

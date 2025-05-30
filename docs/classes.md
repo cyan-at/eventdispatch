@@ -18,23 +18,23 @@ class Blackboard(dict):
 	'''
  	def __init__(self, *args, **kwargs):
  		'''
- 		vanilla
+ 		vanilla + mutex
  		'''
 
  	def __setitem__(self, key, value):
  		'''
- 		vanilla, plus notify mechanism
+ 		vanilla, plus mutex
  		'''
 
- 	def release_cv(self, key):
- 		'''
- 		unsubscribe a condition_var (cv)
- 		'''
+    def __getitem__(self, key):
+        '''
+        vanilla, plus mutex
+        '''
 
- 	def register_payload(self, payload, match_target = None):
- 		'''
- 		subscribe a cv
- 		'''
+    def __delitem__(self, key):
+        '''
+        vanilla, plus mutex
+        '''
 ```
 
 ## EventThread
@@ -147,11 +147,14 @@ class EventDispatch(object):
 
 This lives outside the `core`, but provides a component you can add in your python program.
 
-0. Create `Blackboard` instance(s)
-1. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
-2. Call their `register_blackboard_assets` on their appropriate `Blackboard` instances
-3. Stand up their `run` targets as threads
-4. Best practice (thread hygiene): on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
+0. Define your `Event`s, `Actor` classes
+1. Create `Blackboard` instance(s)
+2. Populate the `Blackboard` with `Event` declarations (name : type pairs)
+3. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
+4. Stand up their `run` targets as threads, stand up your `Actor`s
+5. Best practice (thread hygiene): on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
+
+Please see <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/example1.py" target="_blank">example1</a> program for reference
 
 ```python
 class BlackboardQueueCVED(EventDispatch):

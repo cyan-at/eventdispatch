@@ -6,7 +6,7 @@ Created on 2025-05-23
 Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
-from .core import *
+from core import *
 
 def python2_makedirs_wrapper(path):
     try:
@@ -105,6 +105,31 @@ def wrap_with_prints(pre_msg, post_msg):
         return wrapper
     return decorator
 
+class CommonEvent(Event):
+    debug_color = bcolors.LIGHTCYAN
+
+    def __init__(self, event_id, *args, **kwargs):
+        super(CommonEvent, self).__init__(
+            event_id, *args, **kwargs)
+        self._exception = False
+        self.blackboard = args[0]
+        self.instance = ""
+
+        wrap_instance_method(self, 'log',
+            wrap_with_prints(self.debug_color, bcolors.ENDC))
+
+    def log(self, *args):
+        print(*args)
+
+    @staticmethod
+    def deserialize(ed, blackboard, *args, **kwargs):
+        tokens = args[0]
+        # ed.log("TOKENS! {}".format(tokens))
+        if len(tokens) < 1:
+            raise Exception("not enough tokens", len(tokens))
+
+        return (ed.reserve_event_id(), blackboard), tuple(tokens)
+
 class BlackboardQueueCVED(EventDispatch):
     def __init__(self, blackboard, name):
         super(BlackboardQueueCVED, self).__init__(
@@ -189,48 +214,47 @@ class BlackboardQueueCVED(EventDispatch):
                 self.log("woken from shutdown")
                 break
 
-        # for now, expose this so other types can override it
-        # so we don't need to re-write the whole thing
-        self.prior_cb(blackboard)
+            # for now, expose this so other types can override it
+            # so we don't need to re-write the whole thing
+            self.prior_cb(blackboard)
 
-        ##### core ED logic ####################################
-        while len(blackboard[self.queue_name]) > 0: # buffer and [drain]
-            serialized_class_args = blackboard[self.queue_name].pop(0)
+            ##### core ED logic ####################################
+            while len(blackboard[self.queue_name]) > 0: # buffer and [drain]
+                serialized_class_args = blackboard[self.queue_name].pop(0)
 
-            # s (serialized_event) expected to be
-            # array of [<class>, args]
-            if len(serialized_class_args) == 0:
-                continue
+                # s (serialized_event) expected to be
+                # array of [<class>, args]
+                if len(serialized_class_args) == 0:
+                    continue
 
-            # deserialize & dispatch
-            # print("s[0]", s[0])
-            try:
-                constructor_args, dispatch_args = blackboard[
-                    serialized_class_args[0]].deserialize(
-                        self,
-                        blackboard,
-                        serialized_class_args[1:])
-                # mechanism
-                self.dispatch(
-                    blackboard[serialized_class_args[0]](
-                    *constructor_args),
-                    *dispatch_args)
-            except Exception as e:
-                self.log(self.ed_id
-                    + " failed dispatch %s, exception %s" % (
-                    str(serialized_class_args), str(e)))
-        ########################################################
+                # deserialize & dispatch
+                try:
+                    constructor_args, dispatch_args = blackboard[
+                        serialized_class_args[0]].deserialize(
+                            self,
+                            blackboard,
+                            serialized_class_args[1:])
+                    # mechanism
+                    self.dispatch(
+                        blackboard[serialized_class_args[0]](
+                        *constructor_args),
+                        *dispatch_args)
+                except Exception as e:
+                    self.log(self.ed_id
+                        + " failed dispatch %s, exception %s" % (
+                        str(serialized_class_args), str(e)))
+            ########################################################
 
-        self.post_cb(blackboard)
+            self.post_cb(blackboard)
 
-        # ED tries to 'cleanup'
-        if empty_cv_name is not None:
-            if len(blackboard[self.queue_name]) == 0 and\
-                empty_cv_name in blackboard:
-                self.log("notifying " + empty_cv_name)
-                blackboard[empty_cv_name].acquire()
-                blackboard[empty_cv_name].notify_all()
-                blackboard[empty_cv_name].release()
+            # ED tries to 'cleanup'
+            if empty_cv_name is not None:
+                if len(blackboard[self.queue_name]) == 0 and\
+                    empty_cv_name in blackboard:
+                    self.log("notifying " + empty_cv_name)
+                    blackboard[empty_cv_name].acquire()
+                    blackboard[empty_cv_name].notify_all()
+                    blackboard[empty_cv_name].release()
 
         self.log(self.name + " shutdown")
 
