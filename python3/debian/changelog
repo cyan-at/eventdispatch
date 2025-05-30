@@ -1,3 +1,9 @@
+python3-eventdispatch (0.1.9) noble; urgency=high
+
+  * example1 program
+
+ -- Charlie Yan <cyanatg@gmail.com> Tue, 30 May 2025 00:38:00 -0700
+
 python3-eventdispatch (0.1.8) noble; urgency=high
 
   * ed_common to core

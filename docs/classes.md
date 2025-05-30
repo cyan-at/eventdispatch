@@ -147,7 +147,7 @@ class EventDispatch(object):
 
 This lives outside the `core`, but provides a component you can add in your python program.
 
-0. Define your `Event`s, `Actor` classes
+0. Define your `Event`s, `Actor`s classes
 1. Create `Blackboard` instance(s)
 2. Populate the `Blackboard` with `Event` declarations (name : type pairs)
 3. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
