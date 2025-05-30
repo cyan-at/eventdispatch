@@ -49,4 +49,5 @@ Implementation must be careful about **race conditions** and consider the lower 
 	* 'Buffer-and-drain' : Producers populate some buffer, and whoever reads it, drains it completely every time.
 
 ## Example Use Cases
-(TODO)
+
+1. See <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/example1.py" target="_blank">example1</a>
