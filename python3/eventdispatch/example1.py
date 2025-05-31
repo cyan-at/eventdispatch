@@ -196,7 +196,12 @@ class KeyboardThread(threading.Thread):
             blackboard[ed1.cv_name].notify(1)
             blackboard[ed1.cv_name].release()
 
-            return False
+            release = False
+            with ed1.dispatch_switch_mutex:
+                if not ed1.dispatch_switch:
+                    release = True
+
+            return release
 
         return False
 
@@ -205,7 +210,6 @@ class KeyboardThread(threading.Thread):
 
         while local_hb:
             self.blackboard["input_sem"].acquire()
-            print("unblocked!!!!!!!!!")
 
             if not self.blackboard["ask"]:
                 print("no longer asking, break")
@@ -221,6 +225,12 @@ class KeyboardThread(threading.Thread):
                 local_hb = self.mutable_hb['hb']
 
 def main():
+    print("###################")
+    print("This program exercises some EventDispatch best practices and patterns")
+    print("Type a number to command the system")
+    print("Some commands will dispatch Events, which in turn dispatch other Events")
+    print("###################")
+
     # 0. Create `Blackboard` instance(s)
     blackboard = Blackboard()
 
