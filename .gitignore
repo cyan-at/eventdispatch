@@ -176,3 +176,5 @@ cython_debug/
 python3-eventdispatch_*
 python3/debian/files
 .fuse_hidden*
+
+html/*
