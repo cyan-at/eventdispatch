@@ -12,7 +12,7 @@ sudo apt update
 sudo apt install python3-eventdispatch
 ```
 
-## python3: pip installation
+## python3: [pip](https://pypi.org/project/eventdispatch/0.1.12/) installation
 ```
-TODO
+pip install eventdispatch
 ```
