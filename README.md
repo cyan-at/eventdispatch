@@ -1,4 +1,4 @@
-# eventdispatch
+# [eventdispatch](https://github.com/cyan-at/eventdispatch)
 Event Dispatch: a discrete time synchronizer
 
 ## Documentation
@@ -12,7 +12,7 @@ sudo apt update
 sudo apt install python3-eventdispatch
 ```
 
-## python3: [pip](https://pypi.org/project/eventdispatch/0.1.12/) installation
+## python3: [pip](https://pypi.org/project/eventdispatch/) installation
 ```
 pip install eventdispatch
 ```
