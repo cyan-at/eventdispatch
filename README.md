@@ -1,5 +1,5 @@
 # <a href="https://github.com/cyan-at/eventdispatch" target="_blank">eventdispatch</a>
-Event Dispatch: a discrete time synchronizer
+Event Dispatch: discrete time synchronization
 
 ## Documentation
 
