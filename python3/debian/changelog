@@ -1,3 +1,9 @@
+python3-eventdispatch (0.1.11) noble; urgency=high
+
+  * remove test.py
+
+ -- Charlie Yan <cyanatg@gmail.com> Fri, 30 May 2025 9:38:00 -0700
+
 python3-eventdispatch (0.1.10) noble; urgency=high
 
   * example1 program
