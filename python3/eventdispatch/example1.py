@@ -8,10 +8,10 @@ Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
 
-from .core import *
-from .aux1 import *
+from core import *
+from aux1 import *
 
-import signal, time, os, sys, random
+import signal, time, os, sys, random, threading
 
 # these are examples Event classes
 # together, they define the drift and control in a system
@@ -128,7 +128,9 @@ class CheckEvent1(CommonEvent):
             self.blackboard[event_dispatch.cv_name].notify(1)
             self.blackboard[event_dispatch.cv_name].release()
         else:
-            self.log("results not big enough or drained WorkItems, noop")
+            self.log("results not big enough or drained WorkItems, asking again")
+
+            self.blackboard["input_sem"].release()
 
     def finish(self, event_dispatch, *args, **kwargs):
         self.log("finish!", args, kwargs)
@@ -141,19 +143,30 @@ class KeyboardThread(threading.Thread):
         self.mutable_hb = mutable_hb
         self.blackboard = blackboard
         self.ed1 = ed1
+
         super(KeyboardThread, self).__init__()
 
     def my_callback(self, x, mutable_hb, blackboard, ed1):
+        if len(x) == 0:
+            print("empty")
+            return True
+
+        x = int(x)
+
         #evaluate the keyboard input
         if x == 0:
             print("turning off dispatch")
             with ed1.dispatch_switch_mutex:
                 ed1.dispatch_switch = False
 
+            return True
+
         elif x == 1:
             print("turning on dispatch")
             with ed1.dispatch_switch_mutex:
                 ed1.dispatch_switch = True
+
+            return True
 
         elif x == -1:
             print('exiting')
@@ -166,6 +179,9 @@ class KeyboardThread(threading.Thread):
             blackboard[ed1.hb_key] = False
             with blackboard[ed1.mutex_name]:
                 blackboard[ed1.cv_name].notify_all()
+
+            return True
+
         elif x >= 2 and x <= 5:
             print("dispatching WorkItemEvent(%d)" % (x))
 
@@ -180,16 +196,26 @@ class KeyboardThread(threading.Thread):
             blackboard[ed1.cv_name].notify(1)
             blackboard[ed1.cv_name].release()
 
+            return False
+
+        return False
+
     def run(self):
         local_hb = True
 
         while local_hb:
+            self.blackboard["input_sem"].acquire()
+            print("unblocked!!!!!!!!!")
+
+            if not self.blackboard["ask"]:
+                print("no longer asking, break")
+                break
+
             x = input('enter a number 2-5, 0 to turn off dispatch, 1 to turn on dispatch, -1 to exit\n')
 
-            if len(x) == 0:
-                continue
-
-            self.my_callback(int(x), self.mutable_hb, self.blackboard, self.ed1)
+            release = self.my_callback(x, self.mutable_hb, self.blackboard, self.ed1)
+            if release:
+                self.blackboard["input_sem"].release()
 
             with self.mutable_hb['hb_lock']:
                 local_hb = self.mutable_hb['hb']
@@ -207,6 +233,9 @@ def main():
     blackboard["result_mutex"] = threading.Lock()
     blackboard["result1"] = 0
     blackboard["result2"] = 0
+
+    blackboard["ask"] = True
+    blackboard["input_sem"] = threading.Semaphore(1)
 
     # 2. Create `BlackboardQueueCVED` instance(s) with their individual `name` strings
     ed1 = BlackboardQueueCVED(
@@ -243,11 +272,15 @@ def main():
             blackboard[ed1.cv_name].notify_all()
         blackboard["ed1_thread"].join()
 
+        blackboard["ask"] = False
+        blackboard["input_sem"].release()
+
         print("shutting down")
         sys.exit(0)
-    signal.signal(signal.SIGINT, signal_handler)
-    blackboard["ed1_thread"].join()
 
+    signal.signal(signal.SIGINT, signal_handler)
+
+    blackboard["ed1_thread"].join()
     kthread.join()
 
 if __name__ == '__main__':
