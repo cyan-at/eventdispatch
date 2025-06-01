@@ -38,13 +38,13 @@ class WorkItemEvent(CommonEvent):
         self.blackboard[event_dispatch.cv_name].release()
 
     def finish(self, event_dispatch, *args, **kwargs):
-        self.log("finish!", args, kwargs)
+        self.log("WorkItemEvent finish!", args, kwargs)
 
 class UncertaintEvent1(CommonEvent):
     debug_color = bcolors.CYAN
 
     def dispatch(self, event_dispatch, *args, **kwargs):
-        self.log("dispatch!", args, kwargs)
+        self.log("UncertaintEvent1 dispatch!", args, kwargs)
 
         time.sleep(random.randint(1, 5))
 
@@ -52,7 +52,7 @@ class UncertaintEvent1(CommonEvent):
             self.blackboard["result1"] = random.randint(1, 5)
 
     def finish(self, event_dispatch, *args, **kwargs):
-        self.log("finish!", args, kwargs)
+        self.log("UncertaintEvent1 finish!", args, kwargs)
 
         with self.blackboard["result_mutex"]:
             if self.blackboard["result2"] > 0:
@@ -77,7 +77,7 @@ class UncertaintEvent2(CommonEvent):
     debug_color = bcolors.MAGENTA
 
     def dispatch(self, event_dispatch, *args, **kwargs):
-        self.log("dispatch!", args, kwargs)
+        self.log("UncertaintEvent2 dispatch!", args, kwargs)
 
         time.sleep(random.randint(1, 10))
 
@@ -85,7 +85,7 @@ class UncertaintEvent2(CommonEvent):
             self.blackboard["result2"] = random.randint(1, 10)
 
     def finish(self, event_dispatch, *args, **kwargs):
-        self.log("finish!", args, kwargs)
+        self.log("UncertaintEvent2 finish!", args, kwargs)
 
         with self.blackboard["result_mutex"]:
             if self.blackboard["result1"] > 0:
@@ -110,13 +110,13 @@ class CheckEvent1(CommonEvent):
     debug_color = bcolors.RED
 
     def dispatch(self, event_dispatch, *args, **kwargs):
-        self.log("dispatch!", args, kwargs)
+        self.log("CheckEvent1 dispatch!", args, kwargs)
 
         s = args[1]
-        self.log("sum", s)
+        self.log("CheckEvent1 sum", s)
 
         if s > 5 and args[0] > 0:
-            self.log("results big enough to continue")
+            self.log("CheckEvent1: sum big enough to continue")
 
             self.blackboard[event_dispatch.cv_name].acquire()
             self.blackboard[event_dispatch.queue_name].extend([
@@ -128,12 +128,12 @@ class CheckEvent1(CommonEvent):
             self.blackboard[event_dispatch.cv_name].notify(1)
             self.blackboard[event_dispatch.cv_name].release()
         else:
-            self.log("results not big enough or drained WorkItems, asking again")
+            self.log("CheckEvent1: sum <= 5 or drained remaining WorkItems, prompting again")
 
             self.blackboard["input_sem"].release()
 
     def finish(self, event_dispatch, *args, **kwargs):
-        self.log("finish!", args, kwargs)
+        self.log("CheckEvent1 finish!", args, kwargs)
 
 # this is an example of an 'Actor' / 'continuous-time' process
 # a specialist in the system, that injects entrypoint Event(s)

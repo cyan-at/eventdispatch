@@ -1,3 +1,9 @@
+python3-eventdispatch (0.1.19) noble; urgency=high
+
+  * 0.1.19
+
+ -- Charlie Yan <cyanatg@gmail.com> Fri, 30 May 2025 11:38:00 -0700
+
 python3-eventdispatch (0.1.18) noble; urgency=high
 
   * 0.1.18
