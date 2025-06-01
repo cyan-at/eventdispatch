@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eventdispatch"
-version = "0.1.17"
+version = "0.1.18"
 authors = [{name = "Charlie Yan", email = "cyanatg@gmail.com"}]
 dynamic = ["scripts", "dependencies"]
-description = "Event Dispatch: a discrete time synchronizer"
+description = "Event Dispatch: discrete time synchronization"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
