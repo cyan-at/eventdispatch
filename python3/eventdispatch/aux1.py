@@ -126,7 +126,7 @@ class CommonEvent(Event):
         tokens = args[0]
         # ed.log("TOKENS! {}".format(tokens))
         if len(tokens) < 1:
-            raise Exception("not enough tokens", len(tokens))
+            raise Exception("BlackboardQueueCVED: not enough tokens", len(tokens))
 
         return (ed.reserve_event_id(), blackboard), tuple(tokens)
 
@@ -144,7 +144,7 @@ class BlackboardQueueCVED(EventDispatch):
         pass
 
     def post_cb(self, blackboard):
-        self.log("post_cb!!! {}".format(len(blackboard[self.queue_name])))
+        self.log("BlackboardQueueCVED: post_cb!!! {}".format(len(blackboard[self.queue_name])))
 
     def register_blackboard_assets(self, blackboard, name):
         self.name = name
@@ -211,7 +211,7 @@ class BlackboardQueueCVED(EventDispatch):
 
             # could be woken from shutdown procedure
             if len(blackboard[self.queue_name]) == 0:
-                self.log("woken from shutdown")
+                self.log("BlackboardQueueCVED: woken from shutdown")
                 break
 
             # for now, expose this so other types can override it
@@ -241,7 +241,7 @@ class BlackboardQueueCVED(EventDispatch):
                         *dispatch_args)
                 except Exception as e:
                     self.log(self.ed_id
-                        + " failed dispatch %s, exception %s" % (
+                        + " BlackboardQueueCVED: failed dispatch %s, exception %s" % (
                         str(serialized_class_args), str(e)))
             ########################################################
 
@@ -251,7 +251,7 @@ class BlackboardQueueCVED(EventDispatch):
             if empty_cv_name is not None:
                 if len(blackboard[self.queue_name]) == 0 and\
                     empty_cv_name in blackboard:
-                    self.log("notifying " + empty_cv_name)
+                    self.log("BlackboardQueueCVED: notifying " + empty_cv_name)
                     blackboard[empty_cv_name].acquire()
                     blackboard[empty_cv_name].notify_all()
                     blackboard[empty_cv_name].release()

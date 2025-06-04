@@ -6,35 +6,29 @@
 * Events should be *short-lived*, relying on [actors](classes.md#actors) to focus on *continuous time* tasks.
 * Events should be as **state-less** as possible, instead relying on [blackboard](classes.md#blackboard)s to store state.
 * Keep your Event definitions DRY, push as much variance into arguments.
-* Whenever possible, decompose your use case to the [event](classes.md#event) level, not further to the [dispatch](classes.md#eventdispatch) level unless absolutely necessary.
+* Think in terms of 'levels': decompose your use case to the [event](classes.md#event) level, and *mechanism* level changes belong in the 'lower' [dispatch](classes.md#eventdispatch) level.
 
 ---
 **NOTE**
 
 Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\)
 
-Drift \(f(x)\)
+* Drift \(f(x)\)
+* Diffusion \(g(w)\)
+* Control \(b(u)\)
 
-Diffusion \(g(w)\)
+Events explicitly define \(f(x)\) and \(b(u)\) and **introduce uncertainty** implicitly or **intentionally** into a system.
 
-Control \(b(u)\)
-
-Events define \(f(x)\) and \(b(u)\)
-
-\(g(w)\) is compensated for
-
-Event dispatch systems **inject** drift, control, and **inject uncertainty** into a system
-
-There is **no guarantee of stability nor optimality**, that is left to the implementation 
+There is **no guarantee of stability nor optimality**, that is left to the implementation.
 
 ---
 
 ---
 **NOTE**
 
-Because this framework relies on python's `threading` library, the *exact ordering* of things is not deterministic
+Because this framework relies on python's `threading` library, the *exact ordering* of things is always not deterministic
 
-Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling configuration
+Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling implications
 
 ---
 
