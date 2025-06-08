@@ -154,7 +154,7 @@ This lives outside the `core`, but provides a component you can add in your pyth
 4. Stand up their `run` targets as threads, stand up your `Actor`s
 5. Best practice (thread hygiene): on program shutdown, notify the `BlackboardQueueCVED` cvs and join their `run` threads
 
-Please see <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/example1.py" target="_blank">example1</a> program for reference
+Please see <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/example1.py" target="_blank">example1</a> program for reference
 
 ```python
 class BlackboardQueueCVED(EventDispatch):

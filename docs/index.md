@@ -14,7 +14,7 @@
         * You are encouraged to subclass and override or create your own `EventDispatch` child class
     2. A `CommonEvent` class, with some useful, but not necessary logic
     3. Various other decorators, helper functions
-3. A <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/example1.py" target="_blank">example1</a> python program, you can run after installing via command line: `eventdispatch_example1`
+3. A <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/example1.py" target="_blank">example1</a> python program, you can run after installing via command line: `eventdispatch_example1`
 
 ---
 

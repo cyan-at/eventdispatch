@@ -46,4 +46,4 @@ Practioners are encouraged to be familiar with threading / operating-system cs c
 
 ## Example Use Cases
 
-1. See <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/example1.py" target="_blank">example1</a>
+1. See <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/example1.py" target="_blank">example1</a>
