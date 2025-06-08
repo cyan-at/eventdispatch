@@ -26,9 +26,11 @@ There is **no guarantee of stability nor optimality**, that is left to the imple
 ---
 **NOTE**
 
-Because this framework relies on python's `threading` library, the *exact ordering* of things is always not deterministic
+Because this framework relies on python's `threading` library, the *exact ordering* of things is not always deterministic, especially at the micro / high-traffic levels.
 
-Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling implications
+Implementation must be careful about **race conditions** and consider the lower level OS / kernel scheduling implications.
+
+Practioners are encouraged to be familiar with threading / operating-system cs course concepts
 
 ---
 
