@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='eventdispatch',
-    version='0.1.20',
+    version='0.1.21',
     description='Event Dispatch, a discrete time synchronizer',
     url='http://github.com/cyan-at/eventdispatch',
     author='Charlie Yan',
