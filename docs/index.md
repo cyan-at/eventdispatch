@@ -6,7 +6,7 @@
     1. **[Blackboard](classes.md#blackboard)**, a thread safe dictionary
     2. **[EventThread](classes.md#eventthread)**, a thread subclass
     3. **[Event](classes.md#event)**, the abstract base class to override
-        * Your use case can be decomposed down to `Actors` and `Event` child classes
+        * Your use case can be decomposed down to `EventDispatch` and `Event` child classes
     4. **[EventDispatch](classes.md#eventdispatch)**, which defines core mechanism functions
     5. Various other decorators, helper functions
 2. A **aux1** python module, with:
