@@ -12,9 +12,9 @@ build:
     python: "3.13"
 
 mkdocs:
-  configuration: mkdocs.yml
+  configuration: python3/eventdispatch/mkdocs.yml
 
 # Optionally declare the Python requirements required to build your docs
 python:
    install:
-   - requirements: docs/requirements.txt
+   - requirements: python3/eventdispatch/docs/requirements.txt
