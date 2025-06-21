@@ -1,0 +1,3 @@
+string[] string_array
+float32[] float_array
+int16[] int_array
