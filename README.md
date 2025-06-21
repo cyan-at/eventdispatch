@@ -19,6 +19,10 @@ virtualenv try-eventdispatch
 pip install eventdispatch
 ```
 
+## ROS2-jazzy
+
+Follow the instructions on the [Releases page](https://github.com/cyan-at/eventdispatch/releases/tag/ros2-jazzy)
+
 ## Issues/Contributing
 
 I do not expect the `core` module to be volatile much since the mechanism is very straightforward.
