@@ -1,4 +1,4 @@
-site_name: ros-jazzy-python3-eventdispatch
+site_name: eventdispatch-ros2
 theme:
   name: readthedocs
   highlightjs: true

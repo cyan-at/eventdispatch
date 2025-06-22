@@ -12,9 +12,9 @@ build:
     python: "3.13"
 
 mkdocs:
-  configuration: python3/ros-jazzy-python3-eventdispatch/mkdocs.yml
+  configuration: ros2/eventdispatch-ros2/mkdocs.yml
 
 # Optionally declare the Python requirements required to build your docs
 python:
    install:
-   - requirements: python3/ros-jazzy-python3-eventdispatch/docs/requirements.txt
+   - requirements: ros2/eventdispatch-ros2/docs/requirements.txt
