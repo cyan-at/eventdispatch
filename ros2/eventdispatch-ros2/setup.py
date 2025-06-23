@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 from glob import glob
 
-package_name = 'eventdispatch-ros2'
+package_name = 'eventdispatch_ros2'
 
 setup(
     name=package_name,
@@ -19,7 +19,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-              'ed_node = ros-jazzy-python3-eventdispatch.ed_node:main',
+              'ed_node = eventdispatch_ros2.ed_node:main',
         ],
     },
 )

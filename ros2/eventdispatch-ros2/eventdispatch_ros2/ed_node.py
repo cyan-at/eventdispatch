@@ -16,31 +16,59 @@ from rcl_interfaces.msg import ParameterDescriptor
 from eventdispatch_ros2_interfaces.srv import ROSEvent as EventSrv
 from eventdispatch_ros2_interfaces.msg import ROSEvent as EventMsg
 
+# TODO: module with some middle-level helper Event definitions
+
 class ROS2QueueCVED(BlackboardQueueCVED, Node):
     def __init__(self, blackboard, name):
         BlackboardQueueCVED.__init__(self,
             blackboard, name + "_dispatch")
         Node.__init__(self, name + "_dispatch")
 
+        self.declare_parameter(
+            'events_module_abspath', '')
+        self.events_module_abspath = self.get_parameter(
+            'events_module_abspath').value
+
         self.callback_group = ReentrantCallbackGroup()
         self.create_service(EventSrv,
             '~/dispatch',
-            self.dispatch_cb,
+            self.srv_dispatch_cb,
             callback_group=self.callback_group # necessary
         )
 
-    def dispatch_cb(self, req, response):
-        self.get_logger().warn("dispatch_cb {}".format(
-            req.string_array))
+        qos = QoSProfile(
+            history=rclpy.qos.QoSHistoryPolicy.KEEP_LAST,
+            depth=1,
+            reliability=rclpy.qos.QoSReliabilityPolicy.RELIABLE,
+            durability=rclpy.qos.DurabilityPolicy.VOLATILE)
+        self.create_subscription(
+            EventMsg,
+            '~/dispatch',
+            self.msg_dispatch_cb,
+            qos,
+        )
 
-        if len(req.string_array) > 0:
+    def dispatch_helper(string_array):
+        if len(string_array) > 0:
             # queue-and-notify pattern for maximum client responsiveness
             self.blackboard[self.cv_name].acquire()
             self.blackboard[self.queue_name].append(
-                req.string_array
+                string_array
             )
             self.blackboard[self.cv_name].notify(1)
             self.blackboard[self.cv_name].release()
+
+    def msg_dispatch_cb(self, msg):
+        self.get_logger().warn("msg_dispatch_cb {}".format(
+            msg.string_array))
+
+        dispatch_helper(msg.string_array)
+
+    def srv_dispatch_cb(self, req, response):
+        self.get_logger().warn("srv_dispatch_cb {}".format(
+            req.string_array))
+
+        dispatch_helper(req.string_array)
 
         return response
 
@@ -74,6 +102,8 @@ def main(args=None):
     ##### lifecycle
 
     blackboard["ros_ed_thread"].start()
+
+    node.get_logger().info("ros_ed_thread started")
 
     ### dispatch any 'initiail condition' events here
 
