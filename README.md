@@ -33,6 +33,11 @@ Follow the instructions on the [Releases page](https://github.com/cyan-at/eventd
     ros2 topic pub --once /example1/dispatch eventdispatch_ros2_interfaces/msg/ROSEvent "{string_array: ['WorkItemEvent'], int_array: [1]}"
     ```
 
+3. you can also trigger a service call:
+    ```
+    ros2 service call /example1/dispatch eventdispatch_ros2_interfaces/srv/ROSEvent "{string_array: ['WorkItemEvent'], int_array: [1]}"
+    ```
+
 ## Issues/Contributing
 
 I do not expect the `core` module to be volatile much since the mechanism is very straightforward.
