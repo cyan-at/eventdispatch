@@ -136,7 +136,7 @@ def main(args=None):
 
     node.get_logger().info("ros_ed_thread started")
 
-    ### dispatch any 'initiail condition' events here
+    ### TODO(Charlie) dispatch any initial_events events here
 
     executor = MultiThreadedExecutor()
     try:
