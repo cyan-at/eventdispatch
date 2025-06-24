@@ -1,0 +1,45 @@
+import os
+
+import launch_ros
+from launch import LaunchDescription
+
+from launch.substitutions import (
+    LaunchConfiguration,
+)
+
+from launch.actions import (
+    DeclareLaunchArgument,
+)
+
+def generate_launch_description():
+    node_name = LaunchConfiguration("node_name")
+    events_module_path = LaunchConfiguration("events_module_path")
+
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "node_name", default_value="example1", description="node name"
+            ),
+            DeclareLaunchArgument(
+                "events_module_path", default_value="", description="path to events.py module"
+            ),
+            launch_ros.actions.Node(
+                package="eventdispatch_ros2",
+                executable="ed_node",
+                name="test_ed_node",
+                output="screen",
+                parameters=[
+                    {
+                        "events_module_path" : events_module_path
+                    }
+                ],
+                arguments=[
+                    "--ros-args",
+                    "--log-level",
+                    "warn",
+                    "--log-file-name",
+                    node_name,
+                ],
+            ),
+        ]
+    )

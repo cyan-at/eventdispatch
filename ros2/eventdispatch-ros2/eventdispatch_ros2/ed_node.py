@@ -25,9 +25,9 @@ class ROS2QueueCVED(BlackboardQueueCVED, Node):
         Node.__init__(self, name + "_dispatch")
 
         self.declare_parameter(
-            'events_module_abspath', '')
-        self.events_module_abspath = self.get_parameter(
-            'events_module_abspath').value
+            'events_module_path', '')
+        self.events_module_path = self.get_parameter(
+            'events_module_path').value
 
         self.callback_group = ReentrantCallbackGroup()
         self.create_service(EventSrv,
@@ -36,6 +36,7 @@ class ROS2QueueCVED(BlackboardQueueCVED, Node):
             callback_group=self.callback_group # necessary
         )
 
+        # https://docs.ros.org/en/rolling/Concepts/Intermediate/About-Quality-of-Service-Settings.html
         qos = QoSProfile(
             history=rclpy.qos.QoSHistoryPolicy.KEEP_LAST,
             depth=1,
@@ -81,6 +82,18 @@ def main(args=None):
     rclpy.init(args=args)
 
     node = ROS2QueueCVED(blackboard, "ros_ed")
+
+    if len(node.events_module_path) == 0:
+        node.get_logger().warn('empty events module path, noop')
+        sys.exit(0)
+
+    sys.path.append(os.path.abspath(node.events_module_path))
+    from events import event_dict, initial_events
+    node.get_logger().warn(
+        "loaded {} events, {} initial_events".format(
+            len(event_dict.keys()),
+            len(initial_events))
+        )
 
     blackboard["ros_ed_thread"] = Thread(
     target=node.run,
