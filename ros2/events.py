@@ -135,3 +135,13 @@ event_dict = {
 initial_events = [
 
 ]
+
+def events_module_update_blackboard(blackboard):
+    '''
+    blackboard is the mutable Blackboard object
+    '''
+    blackboard["result_mutex"] = threading.Lock()
+    blackboard["result1"] = 0
+    blackboard["result2"] = 0
+
+    blackboard["input_sem"] = threading.Semaphore(1)

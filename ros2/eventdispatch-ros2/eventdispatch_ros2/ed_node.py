@@ -16,7 +16,7 @@ from rcl_interfaces.msg import ParameterDescriptor
 from eventdispatch_ros2_interfaces.srv import ROSEvent as EventSrv
 from eventdispatch_ros2_interfaces.msg import ROSEvent as EventMsg
 
-# TODO: module with some middle-level helper Event definitions
+# ros2 topic pub --once /example1/dispatch eventdispatch_ros2_interfaces/msg/ROSEvent "{string_array: ['WorkItemEvent'], int_array: [3]}"
 
 class ROS2QueueCVED(BlackboardQueueCVED, Node):
     def __init__(self, blackboard, name):
@@ -49,12 +49,28 @@ class ROS2QueueCVED(BlackboardQueueCVED, Node):
             qos,
         )
 
-    def dispatch_helper(string_array):
-        if len(string_array) > 0:
+    def dispatch_helper(self, rosevent):
+        '''
+        rosevent: obj that contains string_array, float_array, int_array
+        
+        for now, this is one event at a time
+        TODO(implementer) dispatch more than one at a time
+        '''
+        payload = rosevent.string_array
+        payload.extend(rosevent.int_array)
+        payload.extend(rosevent.float_array)
+
+        self.get_logger().warn('payload {}'.format(
+            payload))
+
+        if len(payload) > 0:
+            self.get_logger().warn('going!!! {}'.format(
+                len(payload)))
+
             # queue-and-notify pattern for maximum client responsiveness
             self.blackboard[self.cv_name].acquire()
             self.blackboard[self.queue_name].append(
-                string_array
+                payload
             )
             self.blackboard[self.cv_name].notify(1)
             self.blackboard[self.cv_name].release()
@@ -63,13 +79,13 @@ class ROS2QueueCVED(BlackboardQueueCVED, Node):
         self.get_logger().warn("msg_dispatch_cb {}".format(
             msg.string_array))
 
-        dispatch_helper(msg.string_array)
+        self.dispatch_helper(msg)
 
     def srv_dispatch_cb(self, req, response):
         self.get_logger().warn("srv_dispatch_cb {}".format(
             req.string_array))
 
-        dispatch_helper(req.string_array)
+        self.dispatch_helper(req)
 
         return response
 
@@ -83,17 +99,23 @@ def main(args=None):
 
     node = ROS2QueueCVED(blackboard, "ros_ed")
 
+    ##### event declarations
     if len(node.events_module_path) == 0:
         node.get_logger().warn('empty events module path, noop')
         sys.exit(0)
 
     sys.path.append(os.path.abspath(node.events_module_path))
-    from events import event_dict, initial_events
+    from events import event_dict, initial_events, events_module_update_blackboard
     node.get_logger().warn(
         "loaded {} events, {} initial_events".format(
             len(event_dict.keys()),
             len(initial_events))
         )
+    blackboard.update(event_dict) # TODO(implementer) put this under a 'volatiles' key
+
+    ##### volatiles
+
+    events_module_update_blackboard(blackboard)
 
     blackboard["ros_ed_thread"] = Thread(
     target=node.run,
@@ -107,10 +129,6 @@ def main(args=None):
         # None
     ))
     blackboard["ros_ed"] = node
-
-    ##### event declarations
-
-    ##### volatiles
 
     ##### lifecycle
 

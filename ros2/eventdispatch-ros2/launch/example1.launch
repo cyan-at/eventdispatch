@@ -26,8 +26,9 @@ def generate_launch_description():
             launch_ros.actions.Node(
                 package="eventdispatch_ros2",
                 executable="ed_node",
-                name="test_ed_node",
-                output="screen",
+                name=node_name,
+                output="both", # own_log to only write to file
+                emulate_tty=True, # necessary for ed thread to print to stdout
                 parameters=[
                     {
                         "events_module_path" : events_module_path
@@ -40,6 +41,7 @@ def generate_launch_description():
                     "--log-file-name",
                     node_name,
                 ],
+                # prefix=['stdbuf --output=L'],
             ),
         ]
     )
