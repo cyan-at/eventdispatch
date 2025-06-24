@@ -1,1 +1,5 @@
 tmp_ws/
+
+**/debian/
+**/.pybuild/
+**.deb
