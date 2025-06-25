@@ -11,7 +11,7 @@
 ---
 **LEMMA**
 
-Because computers control **synchronization**, the implement *different equations* of the standard form \(\dot{x} = f(x) + b(u) + g(w)\), the terms being:
+Because computers control **synchronization**, they implement *differential equations* of the standard form \(\dot{x} = f(x) + b(u) + g(w)\), the terms being:
 
 * Drift \(f(x)\)
 * Diffusion \(g(w)\)
@@ -19,7 +19,7 @@ Because computers control **synchronization**, the implement *different equation
 
 Geometrically you can see computers existing in a *n-dimensional* [phase portrait](https://en.wikipedia.org/wiki/Phase_portrait) where [actors](classes.md#actors) and the *full system* propagate the system across an *n-dimensional state vector* \(x\)
 
-Systems *co-locate* eventdispatch system with the state vector \(x\), managing and invoking **drift** and **control**
+Systems *co-locate* eventdispatch(s) with the state vector \(x\), managing and invoking **drift** and **control**. It follows that all eventdispatch systems are **n-dimensional nonlinear controllers**
 
 Events explicitly define \(f(x)\) and \(b(u)\) and **introduce uncertainty** implicitly or **intentionally** into a system
 
