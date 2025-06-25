@@ -19,9 +19,13 @@ Because computers control **synchronization**, they implement *differential equa
 
 Geometrically you can see computers existing in a *n-dimensional* [phase portrait](https://en.wikipedia.org/wiki/Phase_portrait) where [actors](classes.md#actors) and the *full system* propagate the system across an *n-dimensional state vector* \(x\)
 
-Systems *co-locate* eventdispatch(s) with the state vector \(x\), managing and invoking **drift** and **control**. It follows that all eventdispatch systems are **n-dimensional nonlinear controllers**
+Systems *co-locate* the state vector \(x\) with the relevant eventdispatch(s), which manage and invoke **drift** and **control**. It follows that all eventdispatch systems are **n-dimensional nonlinear controllers**
 
-Events explicitly define \(f(x)\) and \(b(u)\) and **introduce uncertainty** implicitly or **intentionally** into a system
+Events explicitly define \(f(x)\) and \(b(u)\)
+
+Introducing \(f(x)\) and \(b(u)\) into a system *always* introduces some magnitude of \(g(w)\)
+
+Often (consider [SGD](https://en.wikipedia.org/wiki/Stochastic_gradient_descent), or dithering) this kind of **uncertainty** is **necessary**, injecting noise is **intentional**
 
 There is **no guarantee of stability nor optimality**, that is left to the implementation
 
