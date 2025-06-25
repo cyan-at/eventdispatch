@@ -30,3 +30,7 @@
 The **EventDispatch** mechanism can be extended to a variety of *messaging mechanisms* in their respective packages, their documentations listed here:
 
 1. [ROS2](https://eventdispatch-ros2.readthedocs.io/en/latest/)
+
+---
+
+For any new messaging mechanism integrations or use case ideas, [email me!](mailto:cyanatg@gmail.com) 
