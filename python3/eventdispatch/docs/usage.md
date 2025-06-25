@@ -9,17 +9,21 @@
 * Think in terms of 'levels': decompose your use case to the [event](classes.md#event) level, and *mechanism* level changes belong in the 'lower' [dispatch](classes.md#eventdispatch) level.
 
 ---
-**NOTE**
+**LEMMA**
 
-Event dispatch systems are *nonlinear control systems*, \(\dot{x} = f(x) + b(u) + g(w)\)
+Because computers control **synchronization**, the implement *different equations* of the standard form \(\dot{x} = f(x) + b(u) + g(w)\), the terms being:
 
 * Drift \(f(x)\)
 * Diffusion \(g(w)\)
 * Control \(b(u)\)
 
-Events explicitly define \(f(x)\) and \(b(u)\) and **introduce uncertainty** implicitly or **intentionally** into a system.
+Geometrically you can see computers existing in a *n-dimensional* [phase portrait](https://en.wikipedia.org/wiki/Phase_portrait) where [actors](classes.md#actors) and the *full system* propagate the system across an *n-dimensional state vector* \(x\)
 
-There is **no guarantee of stability nor optimality**, that is left to the implementation.
+Systems *co-locate* eventdispatch system with the state vector \(x\), managing and invoking **drift** and **control**
+
+Events explicitly define \(f(x)\) and \(b(u)\) and **introduce uncertainty** implicitly or **intentionally** into a system
+
+There is **no guarantee of stability nor optimality**, that is left to the implementation
 
 ---
 
