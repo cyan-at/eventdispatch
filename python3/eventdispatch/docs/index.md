@@ -33,4 +33,4 @@ The **EventDispatch** mechanism can be extended to a variety of *messaging mecha
 
 ---
 
-For any new messaging mechanism integrations or use case ideas, [email me!](mailto:cyanatg@gmail.com) 
+For any new messaging mechanism integrations or use case ideas, <a href="mailto:cyanatg@gmail.com">email me!</a>
