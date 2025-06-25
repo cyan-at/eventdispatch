@@ -24,3 +24,9 @@
     * The number of **Events** *defined/declared/dispatchable* in such a system theoretically limited by the machine's runtime memory limit.
     * *Dispatch* is a **verb**, not a **noun**. Within a system, more than one component can *dispatch events*.
 * Though inspired from robotics systems, this framework is relevant to any system that deals with *uncertainty* and *volatility*. See [Usage patterns & best practices](usage.md).
+
+---
+
+The **EventDispatch** mechanism can be extended to a variety of *messaging mechanisms* in their respective packages, their documentations listed here:
+
+1. [ROS2](https://eventdispatch-ros2.readthedocs.io/en/latest/)
