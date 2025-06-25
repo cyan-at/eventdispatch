@@ -7,6 +7,7 @@
 * Events should be as **state-less** as possible, instead relying on [blackboard](classes.md#blackboard)s to store state.
 * Keep your Event definitions DRY, push as much variance into arguments.
 * Think in terms of 'levels': decompose your use case to the [event](classes.md#event) level, and *mechanism* level changes belong in the 'lower' [dispatch](classes.md#eventdispatch) level.
+* Instead of thinking *before* and *after*, think in terms of **left** and **right**. What is to the **left** of an Event? What is to the **right** of it?
 
 ---
 **LEMMA**
