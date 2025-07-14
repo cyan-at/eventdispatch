@@ -23,7 +23,7 @@
     * The number of events active in memory in a system using **EventDispatch** is theoretically limited by the CPU's thread limit.
     * The number of **Events** *defined/declared/dispatchable* in such a system theoretically limited by the machine's runtime memory limit.
     * *Dispatch* is a **verb**, not a **noun**. Within a system, more than one component can *dispatch events*.
-* Though inspired from robotics systems, this framework is relevant to any system that deals with *uncertainty* and *volatility*. See [Usage patterns & best practices](usage.md).
+* EventDispatch is a mechanism from robotics. However, it is relevant to any system that faces *volatility* in what is asked of it (the right), and *uncertainty* in what it asks of others (the left).  See [Usage patterns & best practices](usage.md).
 
 ---
 
