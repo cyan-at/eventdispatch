@@ -4,7 +4,7 @@ import os, sys, time
 import threading, signal
 
 from .core import *
-from .aux1 import *
+from .common1 import *
 
 '''
 a thread-safe data structure

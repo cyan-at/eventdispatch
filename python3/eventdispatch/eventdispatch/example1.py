@@ -9,7 +9,7 @@ License: Apache-2.0 (see LICENSE for details)
 '''
 
 from .core import *
-from .aux1 import *
+from .common1 import *
 
 import signal, time, os, sys, random, threading
 

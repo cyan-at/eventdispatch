@@ -1,5 +1,5 @@
 from eventdispatch.core import Event
-from eventdispatch.aux1 import *
+from eventdispatch.common1 import *
 
 import signal, time, os, sys, random, threading
 

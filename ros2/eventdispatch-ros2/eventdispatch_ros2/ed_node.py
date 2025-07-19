@@ -4,7 +4,7 @@ import os, sys, time
 file_directory = os.path.dirname(os.path.abspath(__file__)) + "/"
 
 from eventdispatch.core import *
-from eventdispatch.aux1 import *
+from eventdispatch.common1 import *
 
 import rclpy
 from rclpy.node import Node

@@ -9,7 +9,7 @@
         * Your use case can be decomposed down to `EventDispatch` and `Event` child classes
     4. **[EventDispatch](classes.md#eventdispatch)**, which defines core mechanism functions
     5. Various other decorators, helper functions
-2. A **aux1** python module, with:
+2. A **common1** python module, with:
     1. **[BlackboardQueueCVED](classes.md#blackboardqueuecved)**, a example Dispatch subclass that ties the above together
         * You are encouraged to subclass and override or create your own `EventDispatch` child class
     2. A `CommonEvent` class, with some useful, but not necessary logic
