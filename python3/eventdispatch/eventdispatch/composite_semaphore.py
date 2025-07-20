@@ -417,7 +417,7 @@ class Collector(object):
         self.r = []
         self.s = []
 
-if __name__ == "__main__":
+def main():
     s = 4
 
     sem1 = CompositeSemaphore([x for x in range(s)])
@@ -472,3 +472,6 @@ if __name__ == "__main__":
         th.join()
     for th in p_threads:
         th.join()
+
+if __name__ == "__main__":
+    main()
