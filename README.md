@@ -44,4 +44,4 @@ I do not expect the `core` module to be volatile much since the mechanism is ver
 
 Any volatility can arguably be captured in `Event` or `EventDispatch` child classes.
 
-Although archived, I do actively maintain this repo. Please open an issue or file a fork+PR if you have any bugs/bugfixes/features!
+Though it may be archived, I do actively maintain this repo. Please open an issue or file a fork+PR if you have any bugs/bugfixes/features!
