@@ -1,5 +1,5 @@
 # <a href="https://github.com/cyan-at/eventdispatch" target="_blank">eventdispatch</a>
-Event Dispatch: discrete time synchronization, Markov-chain inspired control
+Event Dispatch: discrete time synchronization, Markov-chain control
 
 ## Documentation
 

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='eventdispatch',
-    version='0.2.0',
+    version='0.2.1',
     description='Event Dispatch, a discrete time synchronizer',
     url='http://github.com/cyan-at/eventdispatch',
     author='Charlie Yan',
@@ -13,7 +13,8 @@ setup(
     entry_points=dict(
         console_scripts=[
             'eventdispatch_example1=eventdispatch.example1:main',
-            'eventdispatch_example2=eventdispatch.composite_semaphore:main'
+            'eventdispatch_cs_main=eventdispatch.composite_semaphore:main'
+            'eventdispatch_example2=eventdispatch.example2:main'
         ]
     )
 )

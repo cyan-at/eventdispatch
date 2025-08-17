@@ -145,7 +145,7 @@ class EventDispatch(object):
 
 ## BlackboardQueueCVED
 
-This lives outside the `core`, but provides a component you can add in your python program.
+This lives outside the `core` in `common1`, but provides a component you can add in your python program.
 
 0. Define your `Event`s, `Actor`s classes
 1. Create `Blackboard` instance(s)
@@ -212,4 +212,89 @@ class BlackboardQueueCVED(EventDispatch):
         1. append ['EventName', 'arg1', arg2...] on this Dispatch's queue
         2. notify the dispatch's cv
         '''
+``` 
+
+## [0.2.\*] CompositeSemaphore
+
+While a n-semaphore doesn't maintain distinction of what 'release's it, this class distinguishes between `left` signals
+
+In addition, this class supports *multiple simultaneous* Events `acquire`ing it. And when they can finally acquire, they have metadata in `mutable_shared` in case that acquire was unblocked from various left activity (success, failure, timeout, etc.)
+
+Please see <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/composite_semaphore.py" target="_blank">composite_semaphore</a> program for reference
+
+```python
+class CompositeSemaphore(object):
+    def add_left(self, k)
+
+    def clear_left(self, k)
+
+    def wraparound_idempotent_increment(
+        self, k, identifier=None)
+
+    def release(self, k, identifier=None)
+
+    def acquire(self, identifier, mutable_shared)
+``` 
+
+## [0.2.\*] CSWait
+
+This Event subclass bookkeeps, in a `cs_set`, `cs_registry` and finds or constructs a `CompositeSemaphore`, and acquires on it.
+
+It also exposes some callbacks to override for your usecase
+
+```python
+class CSWait(CommonEvent):
+    def prior_cb(self, args)
+
+    def get_pending(self, args)
+
+    def post_cb(self, args)
+
+    @staticmethod
+    def parse_lefts(s)
+
+    def dispatch(self, event_dispatch, *args, **kwargs)
+
+    def cleanup(self)
+
+    def finish(self, event_dispatch, *args, **kwargs)
+``` 
+
+## [0.2.\*] CSRelease
+
+This Event subclass bookkeeps, finds any `CompositeSemaphore`s in `cs_registry` and releases on them
+
+It also exposes some callbacks to override for your usecase
+
+```python
+class CSRelease(CommonEvent):
+
+    def get_release_status(self, args)
+
+    def prior_cb(self, args)
+
+    def dispatch(self, event_dispatch, *args, **kwargs)
+
+    def finish(self, event_dispatch, *args, **kwargs)
+``` 
+
+## [0.2.\*] CSBQCVED
+
+The core part of this class are the `register_blackboard_assets` and `prior_cb` functions. It is recommended you do NOT override these
+
+* `register_blackboard_assets`
+    - This function adds things to the blackboard that the CS* mechanism needs
+
+* `prior_cb`
+    - Of all the event batches flowing through this Dispatch, it treats `CSWait`s above the rest.
+    - It makes sure `CSWait`s are dispatched and their `CompositeSemaphores` are in place before all other events are dispatched
+
+```python
+class CSBQCVED(BlackboardQueueCVED):
+
+    def register_blackboard_assets(self, blackboard, name)
+
+    def prior_cb(self, blackboard)
+
+    def post_cb(self, blackboard)
 ``` 

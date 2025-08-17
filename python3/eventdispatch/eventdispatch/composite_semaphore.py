@@ -400,16 +400,28 @@ class CSWait(CommonEvent):
 class CSRelease(CommonEvent):
     debug_color = bcolors.MAGENTA
 
-    def dispatch(self, event_dispatch, *args, **kwargs):
+    def get_release_status(self, args):
+        '''
+        override for your use case
+        '''
+        self.log("releasing on {}, {}".format(args[0], args[2]))
+        return int(args[2])
+
+    def prior_cb(self, args):
+        '''
+        override for your use case
+        '''
         if len(args) != (2+1):
             self.log("ARGS {}".format(len(args)))
+            return False
+
+        return True
+
+    def dispatch(self, event_dispatch, *args, **kwargs):
+        if not self.prior_cb(args):
             return
 
         ls, identifier = CSWait.parse_lefts(args[0])
-
-        duplex_or_timeout = int(args[2])
-
-        self.log("releasing on {}, {}".format(args[0], args[2]))
 
         with self.blackboard["volatile"]["cs_registry_l"]:
             for l in ls:
@@ -417,7 +429,7 @@ class CSRelease(CommonEvent):
                     continue
                 self.blackboard["volatile"]["cs_registry"][l].release(
                     l,
-                    (self.instance, duplex_or_timeout))
+                    (self.instance, self.get_release_status(args)))
 
         self.log("CSRelease dispatch done!")
 
@@ -509,6 +521,9 @@ class CSBQCVED(BlackboardQueueCVED):
         self.log("prior_cb DONE!!!!")
 
     def post_cb(self, blackboard):
+        '''
+        override for your use case
+        '''
         self.log("POST_CB!")
 
 def main():
