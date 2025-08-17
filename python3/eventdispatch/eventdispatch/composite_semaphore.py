@@ -270,40 +270,53 @@ class CSWait(CommonEvent):
         '''
         self.mutable_shared = {"status" : 0}
 
-        # must be unique
-        with self.blackboard["volatile"]["cs_registry_l"]:
-            if args[0] in self.blackboard["volatile"]["cs_set"]:
-                self.log("cs exists, bailing")
-                self.mutable_shared["status"] = -1
-                return
-
-        self.log("{} cs init + acquiring".format(
-            args[0]))
-
         ls, identifier = CSWait.parse_lefts(args[0])
         # this must be consistent with dispatch and with CSRelease
+
+        self.ls = ls
+        self.identifier = identifier
 
         if len(ls) == 0:
             self.log("no left cs keys!? bypassing")
             self.mutable_shared["status"] = 2
             return
 
-        self.ls = ls
-        # self.blackboard["volatile"]["cs_set"].update(ls)
+        #######################
 
-        # we use the 'identifier' in cs_set because
-        # for now, CSWaits must be non-overlapping
-        # as in, 2 CSWaits will never share any lefts
-        # and, you can only dispatch a CSWaits of *exactly* the same lefts
-        self.identifier = identifier
-        self.blackboard["volatile"]["cs_set"].update([identifier])
+        # self.exception = False
 
-        self.cs = CompositeSemaphore(ls)
+        # must be unique
+        with self.blackboard["volatile"]["cs_registry_l"] and self.blackboard["volatile"]["cs_cv_l"]:
+            if identifier in self.blackboard["volatile"]["cs_set"]: # implicit no-overlap (black/white matching TODO?)
+                self.log("cs exists")
+                # self.mutable_shared["status"] = -1
+                self.cs = self.blackboard["volatile"]["cs_registry"][self.ls[0]]
+            # elif len(set.intersection(
+            #     set(self.blackboard["volatile"]["cs_registry"].keys()),
+            #     # ids)) == 0:
+            #     self.ls)) > 0:
+            #     self.log("left overlap caught, rejecting CSWait attempt")
+            #     self.exception = True
+            #     return
+            else:
+                self.log("making new cs")
+                #######################
 
-        with self.blackboard["volatile"]["cs_registry_l"]:
-            for li in ls:
-                # all the lefts point to the same cs
-                self.blackboard["volatile"]["cs_registry"][li] = self.cs
+                # self.blackboard["volatile"]["cs_set"].update(ls)
+
+                # we use the 'identifier' in cs_set because
+                # for now, CSWaits must be non-overlapping
+                # as in, 2 CSWaits will never share any lefts
+                # and, you can only dispatch a CSWaits of *exactly* the same lefts
+                self.blackboard["volatile"]["cs_set"].update([identifier])
+
+                self.cs = CompositeSemaphore(ls)
+
+                for li in ls:
+                    # all the lefts point to the same cs
+                    self.blackboard["volatile"]["cs_registry"][li] = self.cs
+
+        #######################
 
         # tell cs_cv waits this cs mouth is open
         with self.blackboard["volatile"]["cs_cv_l"]:
@@ -312,9 +325,14 @@ class CSWait(CommonEvent):
         self.log("{} cs_cv notified".format(
             self.blackboard["volatile"]["cs_set"]))
 
+        #######################
+
         self.prior_cb(args)
 
         self.instance = args[2:]
+
+        self.log("{} cs init + acquiring".format(
+            identifier))
 
         # this is the core mechanism
         self.cs.acquire(
@@ -325,10 +343,11 @@ class CSWait(CommonEvent):
 
     def cleanup(self):
         self.log("cleaning up {}".format(self.ls))
-        with self.blackboard["volatile"]["cs_registry_l"]:
+        with self.blackboard["volatile"]["cs_registry_l"] and self.blackboard["volatile"]["cs_cv_l"]:
             for l in self.ls:
-                cs = self.blackboard["volatile"]["cs_registry"].pop(l)
-                del cs
+                if l in self.blackboard["volatile"]["cs_registry"]:
+                    cs = self.blackboard["volatile"]["cs_registry"].pop(l)
+                    del cs
 
                 # self.log("popping cs_set key {}".format(l))
                 # self.blackboard["volatile"]["cs_set"].remove(
@@ -338,8 +357,9 @@ class CSWait(CommonEvent):
             # for now, CSWaits must be non-overlapping
             # as in, 2 CSWaits will never share any lefts
             # and, you can only dispatch a CSWaits of *exactly* the same lefts
-            self.blackboard["volatile"]["cs_set"].remove(
-                self.identifier)
+            if self.identifier in self.blackboard["volatile"]["cs_set"]:
+                self.blackboard["volatile"]["cs_set"].remove(
+                    self.identifier)
 
             self.log("after {}, cs_set {}".format(
                 self.blackboard["volatile"]["cs_registry"].keys(),
@@ -347,6 +367,10 @@ class CSWait(CommonEvent):
             )
 
     def finish(self, event_dispatch, *args, **kwargs):
+        # if self.exception:
+        #     self.log("noop")
+        #     return
+
         self.cleanup()
 
         if self.mutable_shared["status"] == -1:
@@ -431,10 +455,21 @@ class CSBQCVED(BlackboardQueueCVED):
         non_cs_instances = []
         for instance in blackboard[self.queue_name]:
             if instance[0] in ["CSWait"]: # CSRelease, we only demand open-the-mouth on CSWait, CSRelease we don't care
-                cs_instances.append(instance)
                 ids, identifier = CSWait.parse_lefts(instance[1])
-
                 self.log("instance[1] {}, identifier: {}".format(instance[1], identifier))
+
+                # reject overlap at the dispatch level
+                # instead of in event
+                with blackboard["volatile"]["cs_registry_l"] and blackboard["volatile"]["cs_cv_l"]:
+                    if identifier in self.blackboard["volatile"]["cs_set"]:
+                        cs_instances.append(instance)
+                    elif len(set.intersection(
+                        set(blackboard["volatile"]["cs_registry"].keys()),
+                        # ids)) == 0:
+                        ids)) > 0:
+                        self.log("left overlap caught, rejecting CSWait attempt")
+                    else:
+                        cs_instances.append(instance)
 
                 # expected_cs_ids.update(ids)
 

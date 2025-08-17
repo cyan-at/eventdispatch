@@ -161,8 +161,8 @@ class KeyboardThread2(KeyboardThread):
                         ",".join([str(x) for x in unique]),
 
                         "PrintReleaseEvent",
-                        blocks[1]
-                    ]
+                        x
+                    ] for x in blocks[1]
                 ])
             blackboard[ed1.cv_name].notify(1)
             blackboard[ed1.cv_name].release()
