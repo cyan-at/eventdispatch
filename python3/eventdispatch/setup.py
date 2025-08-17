@@ -13,7 +13,7 @@ setup(
     entry_points=dict(
         console_scripts=[
             'eventdispatch_example1=eventdispatch.example1:main',
-            'eventdispatch_cs_main=eventdispatch.composite_semaphore:main'
+            'eventdispatch_cs_main=eventdispatch.composite_semaphore:main',
             'eventdispatch_example2=eventdispatch.example2:main'
         ]
     )

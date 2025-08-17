@@ -214,7 +214,7 @@ class BlackboardQueueCVED(EventDispatch):
         '''
 ``` 
 
-## [0.2.\*] CompositeSemaphore
+## CompositeSemaphore
 
 While a n-semaphore doesn't maintain distinction of what 'release's it, this class distinguishes between `left` signals
 
@@ -236,7 +236,7 @@ class CompositeSemaphore(object):
     def acquire(self, identifier, mutable_shared)
 ``` 
 
-## [0.2.\*] CSWait
+## CSWait
 
 This Event subclass bookkeeps, in a `cs_set`, `cs_registry` and finds or constructs a `CompositeSemaphore`, and acquires on it.
 
@@ -260,7 +260,7 @@ class CSWait(CommonEvent):
     def finish(self, event_dispatch, *args, **kwargs)
 ``` 
 
-## [0.2.\*] CSRelease
+## CSRelease
 
 This Event subclass bookkeeps, finds any `CompositeSemaphore`s in `cs_registry` and releases on them
 
@@ -278,7 +278,7 @@ class CSRelease(CommonEvent):
     def finish(self, event_dispatch, *args, **kwargs)
 ``` 
 
-## [0.2.\*] CSBQCVED
+## CSBQCVED
 
 The core part of this class are the `register_blackboard_assets` and `prior_cb` functions. It is recommended you do NOT override these
 
