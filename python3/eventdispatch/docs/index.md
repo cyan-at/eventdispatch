@@ -19,7 +19,7 @@
     2. **[CSWait](classes.md#cswait)**, an Event subclass that registers a CompositeSemaphore on some tokens (comma-separated strs) and some Event serializations on the right 
     3. **[CSRelease](classes.md#csrelease)**, an Event subclass that produces some tokens to possibly unblock some CSWaits.
         * Combined with CSWait, this pair allows **volatility**, on-the-fly associations between Events as opposed to an Event type hardcoding what to dispatch next in its **finish** definition
-    4. **[CSBQCVED](classes.md#csvbqcved)**, a BlackboardQueueCVED subclass that enforces CSWait ordering, **necessary** if one wants to use CS* mechanisms
+    4. **[CSBQCVED](classes.md#csbqcved)**, a BlackboardQueueCVED subclass that enforces CSWait ordering, **necessary** if one wants to use CS* mechanisms
 
 
 3. A <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/example1.py" target="_blank">example1</a> python program, you can run after installing via command line: `eventdispatch_example1`
