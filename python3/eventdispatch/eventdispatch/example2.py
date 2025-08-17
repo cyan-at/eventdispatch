@@ -8,15 +8,15 @@ Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
 
-# from .core import *
-# from .common1 import *
-# from .composite_semaphore import *
-# from .example1 import *
+from .core import *
+from .common1 import *
+from .composite_semaphore import *
+from .example1 import *
 
-from core import *
-from common1 import *
-from composite_semaphore import *
-from example1 import KeyboardThread
+# from core import *
+# from common1 import *
+# from composite_semaphore import *
+# from example1 import KeyboardThread
 
 import signal, time, os, sys, random, threading
 
@@ -34,14 +34,6 @@ class PrintReleaseEvent(CommonEvent):
 
         # taken from CSRelease
         ls = list(set(list(args[1])))
-
-        # with self.blackboard["volatile"]["cs_registry_l"]:
-        #     for l in ls:
-        #         if l not in self.blackboard["volatile"]["cs_registry"]:
-        #             continue
-        #         self.blackboard["volatile"]["cs_registry"][l].release(
-        #             l,
-        #             (self.instance, 0))
 
         self.blackboard[event_dispatch.cv_name].acquire()
         self.blackboard[event_dispatch.queue_name].extend(

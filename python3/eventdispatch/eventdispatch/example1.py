@@ -8,8 +8,11 @@ Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
 
-from core import *
-from common1 import *
+from .core import *
+from .common1 import *
+
+# from core import *
+# from common1 import *
 
 import signal, time, os, sys, random, threading
 

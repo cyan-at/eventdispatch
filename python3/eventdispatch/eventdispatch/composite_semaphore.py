@@ -3,8 +3,11 @@
 import os, sys, time
 import threading, signal
 
-from core import *
-from common1 import *
+from .core import *
+from .common1 import *
+
+# from core import *
+# from common1 import *
 
 '''
 a thread-safe data structure

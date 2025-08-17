@@ -6,7 +6,10 @@ Created on 2025-05-23
 Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
-from core import *
+
+from .core import *
+
+# from core import *
 
 def python2_makedirs_wrapper(path):
     try:
