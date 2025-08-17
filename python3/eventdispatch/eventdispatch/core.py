@@ -123,6 +123,7 @@ class EventThread(threading.Thread):
         if self.delay_secs is not None:
             time.sleep(self.delay_secs)
         super(EventThread, self).run()
+        # NOTE: events must deal with exceptions internally
         if self.oneshot:
             self.terminate()
         if self.callback:
@@ -226,6 +227,7 @@ class EventDispatch(object):
                 callback=lambda event = event, args = args, kwargs = kwargs:\
                     self.dispatch_finish(event, *args, **kwargs))
             self.thread_registry[event.get_id()].start()
+            # NOTE: events must deal with exceptions internally
 
     def dispatch_finish(self, event, *args, **kwargs):
         with self.dispatch_mutex:

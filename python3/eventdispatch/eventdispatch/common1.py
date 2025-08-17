@@ -205,6 +205,7 @@ class BlackboardQueueCVED(EventDispatch):
             self.log(self.ed_id
                 + " BlackboardQueueCVED: failed dispatch %s, exception %s" % (
                 str(serialized_class_args), str(e)))
+            return False
 
         return True
 
@@ -232,27 +233,33 @@ class BlackboardQueueCVED(EventDispatch):
             # add conditions (predicates) to protect
             # against spurious wakeups prior or after
             # condition is actually met
-            blackboard[self.mutex_name].release()
+
+            ############################################################
 
             # could be woken from shutdown procedure
             if len(blackboard[self.queue_name]) == 0:
                 self.log("BlackboardQueueCVED: woken from shutdown")
                 break
 
+            ##### core ED logic, done while self.mutex_name is held ####
+
             # for now, expose this so other types can override it
             # so we don't need to re-write the whole thing
             self.prior_cb(blackboard)
 
-            ##### core ED logic ####################################
             while len(blackboard[self.queue_name]) > 0: # buffer and [drain]
                 serialized_class_args = blackboard[self.queue_name].pop(0)
 
                 if not self.do_dispatch(blackboard, serialized_class_args):
+                    self.log(self.name + " failed dispatching something: {}".format(
+                        serialized_class_args))
                     continue
 
-            ########################################################
-
             self.post_cb(blackboard)
+
+            ############################################################
+
+            blackboard[self.mutex_name].release()
 
             # ED tries to 'cleanup'
             if empty_cv_name is not None:
