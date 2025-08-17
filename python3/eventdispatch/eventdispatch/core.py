@@ -34,21 +34,64 @@ def call_when_switch_turned_on(obj, switch, switch_lock):
 
 class Blackboard(dict):
     def __init__(self, *args, **kwargs):
-        self.mutex = Lock()
+        # self.mutex = Lock()
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
+        # free cvs
+        self.cv_pool_lock = Lock()
+        self.cv_pool = []
+        self.cvs = {}
+
     def __setitem__(self, key, value):
-        with self.mutex:
-            super(Blackboard, self).__setitem__(key, value)
+        # with self.mutex:
+        #     super(Blackboard, self).__setitem__(key, value)
 
-    def __getitem__(self, key):
-        with self.mutex:
-            res = super().__getitem__(key)
-        return res
+        super(Blackboard, self).__setitem__(key, value)
+        if key in self.cvs:
+            print("blackboard notifying",
+                key,
+                value)
+            self.cvs[key]['queue'].append(value)
+            with self.cvs[key]['l']:
+                self.cvs[key]['cv'].notify_all()
 
-    def __delitem__(self, key):
-        with self.mutex:
-            super().__delitem__(key)
+    # def __getitem__(self, key):
+    #     with self.mutex:
+    #         res = super().__getitem__(key)
+    #     return res
+
+    # def __delitem__(self, key):
+    #     with self.mutex:
+    #         super().__delitem__(key)
+
+    def release_cv(self, key):
+        print("RELEASING CV", key)
+        with self.cv_pool_lock:
+            if key not in self.cvs:
+                print("RELEASING MISSING CV!", key)
+            else:
+                cv_set = self.cvs.pop(key)
+                cv_set['count'] = 0
+                cv_set.pop('match_target')
+                self.cv_pool.append(cv_set)
+
+    def register_payload(self, payload, match_target = None):
+        with self.cv_pool_lock:
+            if len(self.cv_pool) > 0:
+                cv_set = self.cv_pool.pop(0)
+            else:
+                lock = threading.Lock()
+                cv_set = {
+                    'l' : lock,
+                    'cv' : threading.Condition(lock),
+                    'count' : 0,
+                    'queue' : [],
+                    # pattern: if the mouth is not open before you feed it, using a queue is one solution
+                    # the other solution is to enforce the sync using some blocking logic
+                }
+            cv_set["match_target"] = match_target
+            self.cvs[payload] = cv_set
+        return cv_set
 
 class EventThread(threading.Thread):
     """

@@ -3,8 +3,8 @@
 import os, sys, time
 import threading, signal
 
-from .core import *
-from .common1 import *
+from core import *
+from common1 import *
 
 '''
 a thread-safe data structure
@@ -152,6 +152,8 @@ class CompositeSemaphore(object):
 
         self.semaphores[identifier][1].acquire()
 
+#######################################
+
 def produce_target(sem, x, e, c):
     e.wait(x)
 
@@ -209,201 +211,6 @@ def consume_target(sem, x, delay, c, e):
         sem.clear_left(k)
         c.s.append(k)
 
-class CompositeSemaphoreWait(CommonEvent):
-    debug_color = bcolors.OKGREEN
-
-    def release_instance(self,
-        instance_id,
-        instance,
-        product,
-        instance_increment):
-
-        lock_name = "{}_latest_instance_lock".format(instance_id)
-        if lock_name not in self.blackboard:
-            return
-
-        with self.blackboard[lock_name]:
-            if instance_increment != 0:
-                self.blackboard["{}_instance_count".format(instance_id)] += instance_increment
-            else:
-                self.blackboard["{}_instance_count".format(instance_id)] = \
-                    self.blackboard["{}_instance_count".format(instance_id)]
-            self.blackboard["{}_latest_instance".format(instance_id)].append((
-                product, instance))
-
-    def dispatch(self, event_dispatch, *args, **kwargs):
-        # only CmdEvent takes the a non-blocking-post-dispatch-throttled semaphore
-        # CSWaits are not throttled, by design choice
-
-        # must be unique
-        with self.blackboard["volatile"]["cs_registry_l"]:
-            if args[0] in self.blackboard["volatile"]["cs_set"]:
-                self.log("cs exists, bailing")
-                self.mutable_shared["status"] = -1
-                return
-
-        self.log("{} cs init + acquiring".format(
-            args[0]))
-
-        self.pending = args[2:]
-        self.log("pending {}".format(self.pending))
-
-        # hacky: negative cs numbers
-        # means timeout == passthrough
-        # otherwise, timeout == noop
-        l = [int(x) for x in args[0].split(",")]
-        self.ATTN_TIMER_IDX_passthrough = l[0] < 0
-
-        self.blackboard["volatile"]["cs_set"].update(l)
-
-        if len(l) > 1:
-            self.cs = CompositeSemaphore(
-                l
-            )
-            with self.blackboard["volatile"]["cs_registry_l"]:
-                for li in l:
-                    # all the lefts point to the same cs
-                    self.blackboard["volatile"]["cs_registry"][li] = self.cs
-
-            # tell JsonEvent this cs mouth is open
-            with self.blackboard["volatile"]["cs_cv_l"]:
-                self.blackboard["volatile"]["cs_cv"].notify_all()
-        elif len(l) == 1:
-            with self.blackboard["volatile"]["cs_registry_l"]: 
-                if l[0] in self.blackboard["volatile"]["cs_registry"]:
-                    self.cs = self.blackboard["volatile"]["cs_registry"][
-                    l[0]]
-                else:
-                    self.cs = self.blackboard["volatile"]["cs_registry"][l[0]] =\
-                        CompositeSemaphore(l)
-
-            # tell JsonEvent this cs mouth is open
-            with self.blackboard["volatile"]["cs_cv_l"]:
-                self.blackboard["volatile"]["cs_cv"].notify_all()
-        else:
-            self.log("no left cs keys!? bypassing")
-            self.mutable_shared["status"] = 2
-            return
-
-        # self.instance = "{}_{}".format(
-        #     self.scmd,
-        #     self.event_id
-        # )
-
-        self.instance_id = args[1]
-        self.instance = args[2:]
-        self.release_instance(
-            self.instance_id,
-            self.instance,
-            "semaphored",
-            0)
-
-        # hacky!!! TODO(Charlie) cleanup
-        # CmdEvent args: ('up', 'JsonEvent_0', 'rsim', '0,1,2,3,4,5,6,7,8,9')
-        # pending ('CmdEvent', 'up', 'thermal')
-        self.new_pending = tuple(self.pending[:2]) + (args[1],) + tuple(self.pending[2:])
-        self.log("new_pending {}".format(self.new_pending))
-
-        self.ls = l
-        self.new_key = args[0]
-
-        self.mutable_shared = {"status" : 0}
-        self.cs.acquire(
-            self.instance,
-            self.mutable_shared
-        )
-
-    def cleanup(self):
-        self.log("cleaning up {}".format(self.ls))
-        with self.blackboard["volatile"]["cs_registry_l"]:
-            for l in self.ls:
-                x = self.blackboard["volatile"]["cs_registry"].pop(l)
-                del x
-
-            if self.new_key in self.blackboard["volatile"]["cs_set"]:
-                self.log("popping key")
-                self.blackboard["volatile"]["cs_set"].remove(
-                    self.new_key)
-
-            self.log("after {}".format(
-                self.blackboard["volatile"]["cs_registry"].keys())
-            )
-
-    def finish(self, event_dispatch, *args, **kwargs):
-        self.cleanup()
-
-        if self.mutable_shared["status"] == -1:
-            self.log("CompositeSemaphoreWait noop")
-            return
-
-        self.log(
-            "CompositeSemaphoreWait unblocking {} on {}".format(
-            self.mutable_shared["status"],
-            self.pending))
-
-        # this is the the last left identifier
-        # if it is a timerkill
-        # react differently / noop
-        if type(self.mutable_shared["status"]) == tuple:
-            if self.mutable_shared["status"][1] == ATTN_TIMER_IDX and not self.ATTN_TIMER_IDX_passthrough:
-                self.log("LAST LEFT was ATTN_TIMER_IDX, releasing instances")
-
-                self.release_instance(
-                    self.instance_id,
-                    self.instance,
-                    "cs timed out",
-                    -1)
-
-                return
-            elif self.mutable_shared["status"][1] == ATTN_DUPLEX_IDX and self.ATTN_TIMER_IDX_passthrough:
-                self.log("LAST LEFT was ATTN_DUPLEX_IDX, releasing instances")
-
-                self.release_instance(
-                    self.instance_id,
-                    self.instance,
-                    "timeout cs duplex'd",
-                    -1)
-
-                return
-            else:
-                self.log("LAST LEFT passthrough")
-
-                self.release_instance(
-                    self.instance_id,
-                    self.instance,
-                    "cs unblocked",
-                    0)
-
-        self.blackboard["ed1_cv"].acquire()
-        self.blackboard["ed1_queue"].append(
-            self.new_pending
-        )
-        self.blackboard["ed1_cv"].notify(1)
-        self.blackboard["ed1_cv"].release()
-
-class CSRelease(CommonEvent):
-    debug_color = bcolors.MAGENTA
-
-    def dispatch(self, event_dispatch, *args, **kwargs):
-        if len(args) != (2+1):
-            self.log("ARGS {}".format(len(args)))
-            return
-
-        cs_list = [int(x) for x in args[0].split(",")]
-        duplex_or_timeout = int(args[2])
-
-        self.log("releasing on {}, {}".format(args[0], args[2]))
-
-        for cs in cs_list:
-            with self.blackboard["volatile"]["cs_registry_l"]:
-                if cs not in self.blackboard["volatile"]["cs_registry"]:
-                    continue
-                self.blackboard["volatile"]["cs_registry"][cs].release(
-                    cs,
-                    (self.instance, duplex_or_timeout))
-
-    def finish(self, event_dispatch, *args, **kwargs):
-        pass
 
 class Collector(object):
     def __init__(self, l):
@@ -416,6 +223,255 @@ class Collector(object):
         self.l = l
         self.r = []
         self.s = []
+
+#######################################
+
+class CSWait(CommonEvent):
+    debug_color = bcolors.BLUE
+
+    def prior_cb(self, args):
+        '''
+        override for your use case
+        '''
+        pass
+
+    def get_pending(self, args):
+        '''
+        override for your use case
+        '''
+        self.log("args {}".format(args))
+        return list(args[1:])
+
+    def post_cb(self, args):
+        '''
+        override for your use case
+        '''
+        pass
+
+    @staticmethod
+    def parse_lefts(s):
+        tokens = sorted(list(set(s.split(","))))
+
+        return tokens, ",".join(tokens)
+
+    def dispatch(self, event_dispatch, *args, **kwargs):
+        # only CmdEvent takes the a non-blocking-post-dispatch-throttled semaphore
+        # CSWaits are not throttled, by design choice
+
+        '''
+        args[0]:
+        int(s), signals
+
+        args[1]:
+        ignore
+
+        args[2:]
+        arguments for waiting event
+        '''
+        self.mutable_shared = {"status" : 0}
+
+        # must be unique
+        with self.blackboard["volatile"]["cs_registry_l"]:
+            if args[0] in self.blackboard["volatile"]["cs_set"]:
+                self.log("cs exists, bailing")
+                self.mutable_shared["status"] = -1
+                return
+
+        self.log("{} cs init + acquiring".format(
+            args[0]))
+
+        ls, identifier = CSWait.parse_lefts(args[0])
+        # this must be consistent with dispatch and with CSRelease
+
+        if len(ls) == 0:
+            self.log("no left cs keys!? bypassing")
+            self.mutable_shared["status"] = 2
+            return
+
+        self.ls = ls
+        # self.blackboard["volatile"]["cs_set"].update(ls)
+
+        # we use the 'identifier' in cs_set because
+        # for now, CSWaits must be non-overlapping
+        # as in, 2 CSWaits will never share any lefts
+        # and, you can only dispatch a CSWaits of *exactly* the same lefts
+        self.identifier = identifier
+        self.blackboard["volatile"]["cs_set"].update([identifier])
+
+        self.cs = CompositeSemaphore(ls)
+
+        with self.blackboard["volatile"]["cs_registry_l"]:
+            for li in ls:
+                # all the lefts point to the same cs
+                self.blackboard["volatile"]["cs_registry"][li] = self.cs
+
+        # tell cs_cv waits this cs mouth is open
+        with self.blackboard["volatile"]["cs_cv_l"]:
+            self.blackboard["volatile"]["cs_cv"].notify_all()
+
+        self.log("{} cs_cv notified".format(
+            self.blackboard["volatile"]["cs_set"]))
+
+        self.prior_cb(args)
+
+        self.instance = args[2:]
+
+        # this is the core mechanism
+        self.cs.acquire(
+            self.instance,
+            # separate from what ie release'd, left and right are totally different
+            self.mutable_shared
+        )
+
+    def cleanup(self):
+        self.log("cleaning up {}".format(self.ls))
+        with self.blackboard["volatile"]["cs_registry_l"]:
+            for l in self.ls:
+                cs = self.blackboard["volatile"]["cs_registry"].pop(l)
+                del cs
+
+                # self.log("popping cs_set key {}".format(l))
+                # self.blackboard["volatile"]["cs_set"].remove(
+                #     l)
+
+            # we use the 'identifier' in cs_set because
+            # for now, CSWaits must be non-overlapping
+            # as in, 2 CSWaits will never share any lefts
+            # and, you can only dispatch a CSWaits of *exactly* the same lefts
+            self.blackboard["volatile"]["cs_set"].remove(
+                self.identifier)
+
+            self.log("after {}, cs_set {}".format(
+                self.blackboard["volatile"]["cs_registry"].keys(),
+                self.blackboard["volatile"]["cs_set"])
+            )
+
+    def finish(self, event_dispatch, *args, **kwargs):
+        self.cleanup()
+
+        if self.mutable_shared["status"] == -1:
+            self.log("CSWait noop")
+            return
+
+        pending = self.get_pending(args)
+        self.log(
+            "CSWait unblocking {} on {}".format(
+            self.mutable_shared["status"],
+            pending))
+
+        self.post_cb(args)
+
+        self.blackboard[event_dispatch.cv_name].acquire()
+        self.blackboard[event_dispatch.queue_name].append(
+            list(pending)
+        )
+        self.blackboard[event_dispatch.cv_name].notify(1)
+        self.blackboard[event_dispatch.cv_name].release()
+
+        self.log("CSWait done!")
+
+class CSRelease(CommonEvent):
+    debug_color = bcolors.MAGENTA
+
+    def dispatch(self, event_dispatch, *args, **kwargs):
+        if len(args) != (2+1):
+            self.log("ARGS {}".format(len(args)))
+            return
+
+        ls, identifier = CSWait.parse_lefts(args[0])
+
+        duplex_or_timeout = int(args[2])
+
+        self.log("releasing on {}, {}".format(args[0], args[2]))
+
+        with self.blackboard["volatile"]["cs_registry_l"]:
+            for l in ls:
+                if l not in self.blackboard["volatile"]["cs_registry"]:
+                    continue
+                self.blackboard["volatile"]["cs_registry"][l].release(
+                    l,
+                    (self.instance, duplex_or_timeout))
+
+        self.log("CSRelease dispatch done!")
+
+    def finish(self, event_dispatch, *args, **kwargs):
+        pass
+
+#######################################
+
+class CSBQCVED(BlackboardQueueCVED):
+    '''
+    Of all the events flowing through
+    CS* events will be dispatched prior to any
+    of its peers
+    '''
+    def register_blackboard_assets(self, blackboard, name):
+        super(CSBQCVED, self).register_blackboard_assets(
+            blackboard, name)
+
+        blackboard["volatile"] = {}
+
+        # every left token is mapped to a CS through cs_registry
+        blackboard["volatile"]["cs_registry_l"] = threading.Lock()
+        blackboard["volatile"]["cs_registry"] = {}
+
+        # the set of unique left tokens
+        blackboard["volatile"]["cs_set"] = set()
+
+        # cs_set is signaled via cs_cv
+        blackboard["volatile"]["cs_cv_l"] = threading.Lock()
+        blackboard["volatile"]["cs_cv"] = threading.Condition(
+            blackboard["volatile"]["cs_cv_l"])
+
+    def prior_cb(self, blackboard):
+        self.log("CSBQCVED: prior_cb")
+
+        cs_instances = []
+        expected_cs_ids = set()
+        non_cs_instances = []
+        for instance in blackboard[self.queue_name]:
+            if instance[0] in ["CSWait"]: # CSRelease, we only demand open-the-mouth on CSWait, CSRelease we don't care
+                cs_instances.append(instance)
+                ids, identifier = CSWait.parse_lefts(instance[1])
+
+                self.log("instance[1] {}, identifier: {}".format(instance[1], identifier))
+
+                # expected_cs_ids.update(ids)
+
+                # we use the 'identifier' in cs_set because
+                # for now, CSWaits must be non-overlapping
+                # as in, 2 CSWaits will never share any lefts
+                # and, you can only dispatch a CSWaits of *exactly* the same lefts
+                expected_cs_ids.update([identifier])
+            else:
+                non_cs_instances.append(instance)
+
+        self.log("CS_INSTANCES {}!!!!!".format(cs_instances))
+        self.log("non_cs_instances {}!!!!!".format(non_cs_instances))
+
+        blackboard[self.queue_name] = non_cs_instances
+
+        if len(cs_instances) == 0:
+            self.log("prior_cb DONE!!!!")
+            return
+
+        for cs_instance in cs_instances:
+            self.do_dispatch(blackboard, cs_instance)
+
+        self.log("expected_cs_ids {}!!!!!".format(expected_cs_ids))
+        if len(expected_cs_ids) > 0:
+            self.blackboard["volatile"]["cs_cv_l"].acquire()
+            while len(set.intersection(
+                self.blackboard["volatile"]["cs_set"],
+                # ids)) == 0:
+                expected_cs_ids)) < len(expected_cs_ids):
+                self.blackboard["volatile"]["cs_cv"].wait()
+            self.blackboard["volatile"]["cs_cv_l"].release()
+
+        self.log("prior_cb DONE!!!!")
+
+    def post_cb(self, blackboard):
+        self.log("POST_CB!")
 
 def main():
     s = 4

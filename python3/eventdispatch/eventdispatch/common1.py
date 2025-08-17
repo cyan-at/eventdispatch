@@ -6,7 +6,7 @@ Created on 2025-05-23
 Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
-from .core import *
+from core import *
 
 def python2_makedirs_wrapper(path):
     try:
@@ -183,6 +183,31 @@ class BlackboardQueueCVED(EventDispatch):
     def release_event_id(self, event_id):
         pass
 
+    def do_dispatch(self, blackboard, serialized_class_args):
+        # s (serialized_event) expected to be
+        # array of [<class>, args]
+        if len(serialized_class_args) == 0:
+            return False
+
+        # deserialize & dispatch
+        try:
+            constructor_args, dispatch_args = blackboard[
+                serialized_class_args[0]].deserialize(
+                    self,
+                    blackboard,
+                    serialized_class_args[1:])
+            # mechanism
+            self.dispatch(
+                blackboard[serialized_class_args[0]](
+                *constructor_args),
+                *dispatch_args)
+        except Exception as e:
+            self.log(self.ed_id
+                + " BlackboardQueueCVED: failed dispatch %s, exception %s" % (
+                str(serialized_class_args), str(e)))
+
+        return True
+
     def run(self, blackboard, # expected, dict
         prefix, # expected, str
         empty_cv_name = None, # expected, str
@@ -222,27 +247,9 @@ class BlackboardQueueCVED(EventDispatch):
             while len(blackboard[self.queue_name]) > 0: # buffer and [drain]
                 serialized_class_args = blackboard[self.queue_name].pop(0)
 
-                # s (serialized_event) expected to be
-                # array of [<class>, args]
-                if len(serialized_class_args) == 0:
+                if not self.do_dispatch(blackboard, serialized_class_args):
                     continue
 
-                # deserialize & dispatch
-                try:
-                    constructor_args, dispatch_args = blackboard[
-                        serialized_class_args[0]].deserialize(
-                            self,
-                            blackboard,
-                            serialized_class_args[1:])
-                    # mechanism
-                    self.dispatch(
-                        blackboard[serialized_class_args[0]](
-                        *constructor_args),
-                        *dispatch_args)
-                except Exception as e:
-                    self.log(self.ed_id
-                        + " BlackboardQueueCVED: failed dispatch %s, exception %s" % (
-                        str(serialized_class_args), str(e)))
             ########################################################
 
             self.post_cb(blackboard)
@@ -258,3 +265,5 @@ class BlackboardQueueCVED(EventDispatch):
 
         self.log(self.name + " shutdown")
 
+    def cleanup(self):
+        pass

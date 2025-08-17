@@ -8,8 +8,8 @@ Copyright (c) 2025, Charlie Yan
 License: Apache-2.0 (see LICENSE for details)
 '''
 
-from .core import *
-from .common1 import *
+from core import *
+from common1 import *
 
 import signal, time, os, sys, random, threading
 
@@ -22,6 +22,9 @@ class WorkItemEvent(CommonEvent):
 
     def dispatch(self, event_dispatch, *args, **kwargs):
         self.log("WorkItemEvent: {} remaining items".format(args[0]))
+
+    def finish(self, event_dispatch, *args, **kwargs):
+        self.log("WorkItemEvent finish!", args, kwargs)
 
         self.blackboard[event_dispatch.cv_name].acquire()
         self.blackboard[event_dispatch.queue_name].extend([
@@ -36,9 +39,6 @@ class WorkItemEvent(CommonEvent):
         ])
         self.blackboard[event_dispatch.cv_name].notify(1)
         self.blackboard[event_dispatch.cv_name].release()
-
-    def finish(self, event_dispatch, *args, **kwargs):
-        self.log("WorkItemEvent finish!", args, kwargs)
 
 class UncertaintEvent1(CommonEvent):
     debug_color = bcolors.CYAN
@@ -112,6 +112,9 @@ class CheckEvent1(CommonEvent):
     def dispatch(self, event_dispatch, *args, **kwargs):
         self.log("CheckEvent1 dispatch!", args, kwargs)
 
+    def finish(self, event_dispatch, *args, **kwargs):
+        self.log("CheckEvent1 finish!", args, kwargs)
+
         s = args[1]
         self.log("CheckEvent1 sum", s)
 
@@ -132,8 +135,6 @@ class CheckEvent1(CommonEvent):
 
             self.blackboard["input_sem"].release()
 
-    def finish(self, event_dispatch, *args, **kwargs):
-        self.log("CheckEvent1 finish!", args, kwargs)
 
 # this is an example of an 'Actor' / 'continuous-time' process
 # a specialist in the system, that injects entrypoint Event(s)
@@ -146,12 +147,16 @@ class KeyboardThread(threading.Thread):
 
         super(KeyboardThread, self).__init__()
 
-    def my_callback(self, x, mutable_hb, blackboard, ed1):
+    def cb_1(self, x, mutable_hb, blackboard, ed1):
         if len(x) == 0:
             print("empty")
             return True
 
-        x = int(x)
+        try:
+            x = int(x)
+        except:
+            print("invalid")
+            return True
 
         #evaluate the keyboard input
         if x == 0:
@@ -202,6 +207,10 @@ class KeyboardThread(threading.Thread):
                     release = True
 
             return release
+        else:
+            print("unknown input")
+
+            return True
 
         return False
 
@@ -217,7 +226,7 @@ class KeyboardThread(threading.Thread):
 
             x = input('enter a number 2-5, 0 to turn off dispatch, 1 to turn on dispatch, -1 to exit\n')
 
-            release = self.my_callback(x, self.mutable_hb, self.blackboard, self.ed1)
+            release = self.cb_1(x, self.mutable_hb, self.blackboard, self.ed1)
             if release:
                 self.blackboard["input_sem"].release()
 

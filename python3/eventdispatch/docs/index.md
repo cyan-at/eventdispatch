@@ -18,6 +18,10 @@
 
 ---
 
+* EventDispatch is based on the idea that **what happens defines what happens *next***. Independently derived, the idea is a mirror of <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov chains</a>.
+    * EventDispatch frames *all computer programs as superpositioned Markov processes*.
+    * Control in this architecture is not an external actor taming a plant, but a collective of Markov state transitions, *coexisting* alongside *drift* and *stochasticity*.
+
 * Other synchronization architectures exist such as <a href="https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)" target="_blank">behavior trees</a> and <a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="_blank">state machines</a>.
 * Compared to those architectures, **eventdispatch** is *thin*, *scalable*, inherently *concurrent*.
     * The number of events active in memory in a system using **EventDispatch** is theoretically limited by the CPU's thread limit.
