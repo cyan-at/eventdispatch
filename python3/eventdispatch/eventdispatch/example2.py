@@ -172,9 +172,12 @@ class KeyboardThread2(KeyboardThread):
 
 def main():
     print("###################")
-    print("This program exercises some EventDispatch best practices and patterns")
-    print("Type a number to command the system")
-    print("Some commands will dispatch Events, which in turn dispatch other Events")
+    print("This program exercises the CSBQCVED CSWait CSRelease mechanism")
+    print("Type a number to command the system, of the form ####aaa or aaa#####, where # = [0,9]")
+    print("If # comes first, that command will match the # signal with printing the letter(s)")
+    print("If a comes first, that command will match printing the letter(s) with producing those # signals")
+    print("")
+    print("In this way, you can create on-the-fly associations between printing some letters with printing others")
     print("###################")
 
     # 0. Create `Blackboard` instance(s)
