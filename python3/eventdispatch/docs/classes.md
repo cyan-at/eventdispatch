@@ -166,6 +166,8 @@ class BlackboardQueueCVED(EventDispatch):
     def prior_cb(self, blackboard):
         '''
         before draining any events in the queue, call this
+
+        override this in CSBQCVED, for your use case
         '''
 
     def post_cb(self, blackboard):
@@ -196,6 +198,14 @@ class BlackboardQueueCVED(EventDispatch):
     def release_event_id(self, event_id):
         '''
         free event_id
+        override your use case
+        '''
+
+    def do_dispatch(self, blackboard, serialized_class_args):
+        '''
+        stubbed out to support CSBQCVED
+
+        avoid overriding this
         '''
 
     def run(self, blackboard, # expected, dict
@@ -245,10 +255,19 @@ It also exposes some callbacks to override for your usecase
 ```python
 class CSWait(CommonEvent):
     def prior_cb(self, args)
+        '''
+        override for your use case
+        '''
 
     def get_pending(self, args)
+        '''
+        override for your use case
+        '''
 
     def post_cb(self, args)
+        '''
+        override for your use case
+        '''
 
     @staticmethod
     def parse_lefts(s)
@@ -268,10 +287,15 @@ It also exposes some callbacks to override for your usecase
 
 ```python
 class CSRelease(CommonEvent):
-
     def get_release_status(self, args)
+        '''
+        override for your use case
+        '''
 
     def prior_cb(self, args)
+        '''
+        override for your use case
+        '''
 
     def dispatch(self, event_dispatch, *args, **kwargs)
 
@@ -295,6 +319,12 @@ class CSBQCVED(BlackboardQueueCVED):
     def register_blackboard_assets(self, blackboard, name)
 
     def prior_cb(self, blackboard)
+        '''
+        avoid overriding this
+        '''
 
     def post_cb(self, blackboard)
+        '''
+        override for your use case
+        '''
 ``` 

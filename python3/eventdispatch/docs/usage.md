@@ -53,6 +53,8 @@ Practioners are encouraged to be familiar with threading / operating-system cs c
 	* 'Open-the-mouth-before-you-feed-it' : For example, make sure any `condition_variable` is waited upon before you notify it.
 	* 'Buffer-and-drain' : Producers populate some buffer, and whoever reads it, drains it completely every time.
 
+* To deal with *volatility* in connections between Events, consider using `CSWait`+`CSRelease` in a `CSBQCVED` dispatch.
+
 ## Example Use Cases
 
 1. See <a href="https://github.com/cyan-at/eventdispatch/blob/main/python3/eventdispatch/eventdispatch/example1.py" target="_blank">example1</a>

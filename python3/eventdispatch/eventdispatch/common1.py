@@ -144,10 +144,17 @@ class BlackboardQueueCVED(EventDispatch):
         self.event_id_max = 0
 
     def prior_cb(self, blackboard):
+        '''
+        override for your use case
+        '''
         pass
 
     def post_cb(self, blackboard):
-        self.log("BlackboardQueueCVED: post_cb!!! {}".format(len(blackboard[self.queue_name])))
+        '''
+        override for your use case
+        '''
+        self.log("BlackboardQueueCVED: post_cb!!! {}".format(
+            len(blackboard[self.queue_name])))
 
     def register_blackboard_assets(self, blackboard, name):
         self.name = name
@@ -184,9 +191,19 @@ class BlackboardQueueCVED(EventDispatch):
         return x
 
     def release_event_id(self, event_id):
+        '''
+        free event_id
+        override your use case
+        '''
         pass
 
     def do_dispatch(self, blackboard, serialized_class_args):
+        '''
+        stubbed out to support CSBQCVED
+
+        avoid overriding this
+        '''
+
         # s (serialized_event) expected to be
         # array of [<class>, args]
         if len(serialized_class_args) == 0:

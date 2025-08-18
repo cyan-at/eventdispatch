@@ -463,6 +463,9 @@ class CSBQCVED(BlackboardQueueCVED):
             blackboard["volatile"]["cs_cv_l"])
 
     def prior_cb(self, blackboard):
+        '''
+        avoid overriding this
+        '''
         self.log("CSBQCVED: prior_cb")
 
         cs_instances = []
