@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eventdispatch"
-version = "0.2.2"
+version = "0.2.3"
 authors = [{name = "Charlie Yan", email = "cyanatg@gmail.com"}]
 dynamic = ["scripts", "dependencies"]
 description = "Event Dispatch: discrete time synchronization"

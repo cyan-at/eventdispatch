@@ -127,19 +127,36 @@ class KeyboardThread2(KeyboardThread):
 
         if not blocks[0].isnumeric():
             unique_letters = set(list(blocks[0]))
+            unique_numbers = set(list(blocks[1]))
 
             blackboard[ed1.cv_name].acquire()
             blackboard[ed1.queue_name].extend(
+                # every number on the right waits for every letter on the left
+
+                # every letter on the left releases itself
+                # the CSWait on every letter holds every number
+                # until all letters are printed
+
                 [
 
                     [
                         "PrintReleaseEvent",
                         letter,
-                        blocks[1]
+                        letter
                     ]
                     for letter in unique_letters
+                ] + [
+                    [
+                        "CSWait",
+                        ",".join([str(x) for x in unique_letters]),
 
-                ])
+                        "CSRelease",
+                        ",".join([str(x) for x in unique_numbers]),
+                        "",
+                        0
+                    ]
+                ]
+            )
             blackboard[ed1.cv_name].notify(1)
             blackboard[ed1.cv_name].release()
         else:
