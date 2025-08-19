@@ -1,4 +1,4 @@
-Source: python3-eventdispatch
+Source: python-eventdispatch
 Maintainer: Charlie Yan <cyanatg@gmail.com>
 Build-Depends: debhelper,dh-python,python3-all,python3-setuptools
 Section: devel
@@ -6,7 +6,7 @@ Priority: optional
 Standards-Version: 3.9.6
 X-Python3-Version: >= 3.6
 
-Package: python3-eventdispatch
+Package: python-eventdispatch
 Architecture: all
 Description: Event Dispatch, a discrete time synchronizer
 Depends: ${python3:Depends},python3-requests

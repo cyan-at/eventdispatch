@@ -178,3 +178,6 @@ python3/debian/files
 .fuse_hidden*
 
 html/*
+
+python-eventdispatch_*
+python/debian/files

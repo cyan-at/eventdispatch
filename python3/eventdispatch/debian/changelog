@@ -1,3 +1,15 @@
+python-eventdispatch (0.2.4) noble; urgency=high
+
+  * rename to 'python' prefix
+
+ -- Charlie Yan <cyanatg@gmail.com> Tue, 19 Aug 2025 23:38:00 -0700
+
+python-eventdispatch (0.2.3) noble; urgency=high
+
+  * rename to 'python' prefix
+
+ -- Charlie Yan <cyanatg@gmail.com> Mon, 18 Aug 2025 23:38:00 -0700
+
 python3-eventdispatch (0.2.3) noble; urgency=high
 
   * 0.2.3
