@@ -1,4 +1,4 @@
-site_name: python3-eventdispatch
+site_name: python-eventdispatch
 theme:
   name: readthedocs
   highlightjs: true

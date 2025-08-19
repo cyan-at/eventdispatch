@@ -1,4 +1,4 @@
-# [python3-eventdispatch](https://github.com/cyan-at/eventdispatch)
+# [python-eventdispatch](https://github.com/cyan-at/eventdispatch)
 
 **eventdispatch** is a Python package for solving the *discrete time synchronization problem* in any computer system. It consists of:
 
